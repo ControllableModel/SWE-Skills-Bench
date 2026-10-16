@@ -1,11 +1,4 @@
 #!/bin/bash
-#SBATCH --job-name=build-cpp-img
-#SBATCH --nodes=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=256G
-#SBATCH --time=02:00:00
-#SBATCH --output=outputs/slurm_logs/%x-%j.out
-#SBATCH --error=outputs/slurm_logs/%x-%j.err
 #
 # Build swe-skills-bench-cpp-ext image via enroot export (NO docker).
 # Derives from the already-built node-ext sqsh (has node20 + claude-cli 2.1.168
@@ -15,7 +8,7 @@
 # other benchmark images.
 set -euo pipefail
 
-IMG="${SWE_ENROOT_IMAGE_CACHE:-${PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(pwd)}}/data/enroot-images}"
+IMG="${SWE_ENROOT_IMAGE_CACHE:-${PROJECT_DIR:-$(pwd)}/data/enroot-images}"
 export SWE_ENROOT_IMAGE_CACHE="$IMG"
 
 SRC="$IMG/zhangyiiiiii+swe-skills-bench-node-ext.sqsh"   # node-ext base (has cli2168 + g++)
@@ -24,7 +17,7 @@ OUT="$IMG/zhangyiiiiii+swe-skills-bench-cpp-ext.sqsh"
 [ -f "$SRC" ] || { echo "[build] missing base $SRC"; exit 1; }
 if [ -f "$OUT" ]; then echo "[build] already exists: $OUT (remove to rebuild)"; exit 0; fi
 
-NAME="buildcpp_${SLURM_JOB_ID:-manual}"
+NAME="buildcpp_${RUN_ID:-$$}"
 echo "[build] host=$(hostname)  $SRC -> $OUT"
 
 enroot remove -f "$NAME" 2>/dev/null || true

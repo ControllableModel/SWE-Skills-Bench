@@ -1,11 +1,4 @@
 #!/bin/bash
-#SBATCH --job-name=bake-bun
-#SBATCH --nodes=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=128G
-#SBATCH --time=02:00:00
-#SBATCH --output=outputs/slurm_logs/%x-%j.out
-#SBATCH --error=outputs/slurm_logs/%x-%j.err
 #
 # Bake the implementing-jsc-classes-zig toolchain (bun + LLVM-21 + rust stable)
 # into a bun-ext image. Recipe validated by probe_jsc_zig_build round 4:
@@ -14,11 +7,12 @@
 #
 # Env: BASE (source sqsh basename, required), OUT (output basename, required)
 set -euo pipefail
-IMG="${SWE_ENROOT_IMAGE_CACHE:-${PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(pwd)}}/data/enroot-images}"
+RUN_ID="${RUN_ID:-${SLURM_JOB_ID:-$$}}"
+IMG="${SWE_ENROOT_IMAGE_CACHE:-${PROJECT_DIR:-$(pwd)}/data/enroot-images}"
 : "${BASE:?}"; : "${OUT:?}"
 SRC="$IMG/${BASE}.sqsh"; DST="$IMG/${OUT}.sqsh"
 [ -f "$SRC" ] || { echo "missing $SRC"; exit 1; }
-NAME="bakebun_${SLURM_JOB_ID}"
+NAME="bakebun_${RUN_ID}"
 cleanup() { enroot remove -f "$NAME" 2>/dev/null || true; rm -f "$IMG/${OUT}.sqsh.new"; }
 trap cleanup EXIT
 

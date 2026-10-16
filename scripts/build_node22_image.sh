@@ -1,11 +1,4 @@
 #!/bin/bash
-#SBATCH --job-name=build-node22-img
-#SBATCH --nodes=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=256G
-#SBATCH --time=02:00:00
-#SBATCH --output=outputs/slurm_logs/%x-%j.out
-#SBATCH --error=outputs/slurm_logs/%x-%j.err
 #
 # Build swe-skills-bench-node image via enroot export (NO docker).
 # Derives from the existing python sqsh (already has python3.11 + pytest),
@@ -15,7 +8,7 @@
 # from cache with zero code/registry changes.
 set -euo pipefail
 
-IMG="${SWE_ENROOT_IMAGE_CACHE:-${PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(pwd)}}/data/enroot-images}"
+IMG="${SWE_ENROOT_IMAGE_CACHE:-${PROJECT_DIR:-$(pwd)}/data/enroot-images}"
 export SWE_ENROOT_IMAGE_CACHE="$IMG"
 
 SRC="$IMG/zhangyiiiiii+swe-skills-bench-python.sqsh"     # plain python base
@@ -25,7 +18,7 @@ NODE_MAJOR=22
 [ -f "$SRC" ] || { echo "[build] missing base $SRC"; exit 1; }
 if [ -f "$OUT" ]; then echo "[build] already exists: $OUT (remove it to rebuild)"; exit 0; fi
 
-NAME="buildnode_${SLURM_JOB_ID:-manual}"
+NAME="buildnode_${RUN_ID:-$$}"
 echo "[build] host=$(hostname)  $SRC -> $OUT"
 
 # Clean up any stale container with this name, then create a fresh writable rootfs.

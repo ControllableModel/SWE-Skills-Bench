@@ -1,14 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=bake-codex
-#SBATCH --nodes=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
-#SBATCH --time=01:00:00
-#SBATCH --output=outputs/slurm_logs/%x-%j.out
-#SBATCH --error=outputs/slurm_logs/%x-%j.err
 #
 # Bake @openai/codex into a benchmark image via enroot export (no docker), on top of the
-# already-CLI-baked `-cli2168` set. Same mechanism as scripts/bake_image.sbatch — the CLI is
+# already-CLI-baked `-cli2168` set. Same mechanism as scripts/bake_image.sh — the CLI is
 # PHYSICALLY installed into a --rw instance then frozen with `enroot export` into a self-contained
 # sqsh (NOT a runtime mount). Basing on `-cli2168` keeps the validated claude 2.1.168 byte-identical.
 #
@@ -21,7 +14,8 @@
 #
 # Output: $IMG/${BASE}-codex.sqsh  (contains claude + codex)
 set -euo pipefail
-IMG="${SWE_ENROOT_IMAGE_CACHE:-${PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(pwd)}}/data/enroot-images}"
+RUN_ID="${RUN_ID:-${SLURM_JOB_ID:-$$}}"
+IMG="${SWE_ENROOT_IMAGE_CACHE:-${PROJECT_DIR:-$(pwd)}/data/enroot-images}"
 : "${BASE:?set BASE (e.g. zhangyiiiiii+swe-skills-bench-python-cli2168)}"
 CODEX_VERSION="${CODEX_VERSION:-0.144.1}"
 SMOKE="${SMOKE:-1}"
@@ -42,8 +36,8 @@ echo "=================================================="
 # `enroot start`. NVIDIA_VISIBLE_DEVICES=void makes the hook short-circuit (same fix as the
 # runtime in enroot_manager.py). Apply to ALL bake starts, not just the smoke.
 NV="-e NVIDIA_VISIBLE_DEVICES=void"
-NAME="bakecodex_${BASE//[^a-zA-Z0-9]/_}_${SLURM_JOB_ID}"
-cleanup() { enroot remove -f "$NAME" 2>/dev/null || true; enroot remove -f "${NAME}_smoke" 2>/dev/null || true; rm -rf "/tmp/codexhome-${SLURM_JOB_ID}" 2>/dev/null || true; }
+NAME="bakecodex_${BASE//[^a-zA-Z0-9]/_}_${RUN_ID}"
+cleanup() { enroot remove -f "$NAME" 2>/dev/null || true; enroot remove -f "${NAME}_smoke" 2>/dev/null || true; rm -rf "/tmp/codexhome-${RUN_ID}" 2>/dev/null || true; }
 trap cleanup EXIT
 
 if [ -f "$OUT" ]; then
@@ -81,7 +75,7 @@ if [ "$SMOKE" != "1" ]; then
 fi
 
 [ -f "$HOME/.codex/auth.json" ] || { echo "[smoke] ERROR: $HOME/.codex/auth.json missing (run \`codex login\` first)"; exit 1; }
-CODEX_HOME="/tmp/codexhome-${SLURM_JOB_ID}"
+CODEX_HOME="/tmp/codexhome-${RUN_ID}"
 mkdir -p "$CODEX_HOME"
 cp "$HOME/.codex/auth.json" "$CODEX_HOME/auth.json"
 # Minimal config: chatgpt subscription login, trust the workdir so exec won't prompt.

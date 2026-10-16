@@ -1,29 +1,24 @@
 #!/bin/bash
-#SBATCH --job-name=swe-ext
-#SBATCH --nodes=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=256G
-#SBATCH --time=06:00:00
-#SBATCH --output=outputs/slurm_logs/%x-%j.out
-#SBATCH --error=outputs/slurm_logs/%x-%j.err
 #
 # Runner for the unified 98 skills (config/benchmark_config.yaml).
-# Processes ONE (batch=batch1, skill_mode) combination end-to-end: run -> eval -> cleanup.
+# Processes ONE (batch, skill_mode) combination end-to-end: run -> eval -> cleanup.
+# Plain bash; also works unchanged as a SLURM batch script (sbatch scripts/run_batch.sh).
 #
 # Env vars:
 #   SKILL_MODE        all|none|one (required)
 #   BATCH             batchN, N in 1..10 (default batch1)
-#   ONLY_SKILLS       comma-list (NOTE: sbatch --export splits on commas — use ONLY_SKILLS_FILE for >1)
+#   ONLY_SKILLS       comma-separated skill ids
 #   ONLY_SKILLS_FILE  path to a file with one skill id per line (preferred for multi-skill)
 #   FORCE_RERUN       true to wipe the completion marker first
 set -euo pipefail
+RUN_ID="${RUN_ID:-${SLURM_JOB_ID:-$$}}"
 
 BATCH="${BATCH:-batch1}"
 # AGENT + MODEL_NAME are the report/container dimensions. Defaults reproduce the
 # original claude+haiku behaviour. For a different model, pass MODEL_NAME (must equal
 # the sanitized get_model_name() output, i.e. = MODEL_NAME env / ANTHROPIC_DEFAULT_SONNET_MODEL);
 # for a different agent, pass AGENT (claude|codex|gemini). e.g. for Kimi via CCR:
-#   --export=ALL,...,AGENT=claude,MODEL_NAME=Kimi-K2.6,ANTHROPIC_BASE_URL=...,ANTHROPIC_AUTH_TOKEN=...,ANTHROPIC_DEFAULT_SONNET_MODEL=Kimi-K2.6
+#   AGENT=claude MODEL_NAME=Kimi-K2.6 ANTHROPIC_DEFAULT_SONNET_MODEL=Kimi-K2.6 bash scripts/run_batch.sh
 AGENT="${AGENT:-claude}"
 MODEL_NAME="${MODEL_NAME:-claude-haiku-4-5}"
 export AGENT MODEL_NAME
@@ -35,33 +30,36 @@ case "$SKILL_MODE" in
     *) echo "ERROR: bad SKILL_MODE=$SKILL_MODE" >&2; exit 1 ;;
 esac
 
-PROJECT_DIR="${PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(pwd)}}"
-ENV_NAME=swe-skills-bench
+PROJECT_DIR="${PROJECT_DIR:-$(pwd)}"
+ENV_NAME="${CONDA_ENV:-swe-skills-bench}"
 export SWE_ENROOT_IMAGE_CACHE="${SWE_ENROOT_IMAGE_CACHE:-$PROJECT_DIR/data/enroot-images}"
 export SWE_FRESH_CONTAINER=1
 
 # SWE_ISOLATE_ENROOT=1 → give this job its OWN enroot state (data/shared/pid/runtime), keyed by
-# SLURM_JOB_ID, so MULTIPLE benchmark jobs can pack onto ONE node WITHOUT the node-level enroot
-# state collision that poisons skill registration. Lets us drop --exclusive and pack onto
-# partially-free nodes. Big rootfs -> shared FS; pids/runtime -> local tmp.
+# RUN_ID, so MULTIPLE benchmark runs can pack onto ONE node WITHOUT the node-level enroot
+# state collision that poisons skill registration. Big rootfs -> shared FS; pids/runtime -> local tmp.
 if [[ "${SWE_ISOLATE_ENROOT:-0}" == "1" ]]; then
-    # SWE_ISOLATE_ROOT overrides where per-job rootfs live. Default (home) has a SMALL quota:
+    # SWE_ISOLATE_ROOT overrides where per-run rootfs live. Default (home) has a SMALL quota:
     # 6 concurrent jobs unpacking rootfs there blew it (ENOSPC across 4 nodes, 2026-07-15).
     # Point it at a large-quota filesystem for multi-job packing.
-    _ISO_WEKA="${SWE_ISOLATE_ROOT:-$PROJECT_DIR/enroot-state}/job-${SLURM_JOB_ID}"
-    _ISO_LOCAL="/tmp/enroot-state-${SLURM_JOB_ID}"
+    _ISO_WEKA="${SWE_ISOLATE_ROOT:-$PROJECT_DIR/enroot-state}/job-${RUN_ID}"
+    _ISO_LOCAL="/tmp/enroot-state-${RUN_ID}"
     export ENROOT_DATA_PATH="${_ISO_WEKA}/data"
     export SWE_ENROOT_SHARED_ROOT="${_ISO_WEKA}/shared"
     export SWE_ENROOT_PID_ROOT="${_ISO_LOCAL}/pids"
     export ENROOT_RUNTIME_PATH="${_ISO_LOCAL}/runtime"
     mkdir -p "$ENROOT_DATA_PATH" "$SWE_ENROOT_SHARED_ROOT" "$SWE_ENROOT_PID_ROOT" "$ENROOT_RUNTIME_PATH"
     trap 'rm -rf "${_ISO_WEKA}" "${_ISO_LOCAL}" 2>/dev/null || true' EXIT
-    echo "SWE_ISOLATE_ENROOT=1: per-job enroot state (DATA=$ENROOT_DATA_PATH RUNTIME=$ENROOT_RUNTIME_PATH)"
+    echo "SWE_ISOLATE_ENROOT=1: per-run enroot state (DATA=$ENROOT_DATA_PATH RUNTIME=$ENROOT_RUNTIME_PATH)"
 fi
 
 cd "$PROJECT_DIR"
-source "$(conda info --base)/etc/profile.d/conda.sh"
-conda activate "$ENV_NAME"
+mkdir -p outputs/logs
+# Activate the conda env if conda is available (skip with CONDA_ENV=none).
+if [[ "$ENV_NAME" != "none" ]] && command -v conda >/dev/null 2>&1; then
+    source "$(conda info --base)/etc/profile.d/conda.sh"
+    conda activate "$ENV_NAME"
+fi
 
 # Sanity: the requested batch must have its task + test files on disk.
 if [[ ! -d "tasks/$BATCH" || ! -d "tests/$BATCH" ]]; then
@@ -69,7 +67,7 @@ if [[ ! -d "tasks/$BATCH" || ! -d "tests/$BATCH" ]]; then
 fi
 
 # Build a temp config from the unified config with the CLI-baked / -ext images.
-TMP_CFG=/tmp/ext_cfg_${SLURM_JOB_ID}.yaml
+TMP_CFG=/tmp/ext_cfg_${RUN_ID}.yaml
 python - <<PY
 import yaml, os
 cfg = yaml.safe_load(open("$PROJECT_DIR/config/benchmark_config.yaml"))
@@ -105,7 +103,7 @@ with open("$TMP_CFG", "w") as f:
 PY
 
 echo "=================================================="
-echo "  Job:       $SLURM_JOB_NAME ($SLURM_JOB_ID)   Node: $(hostname)"
+echo "  Job:       run $RUN_ID   Node: $(hostname)"
 echo "  BATCH:     $BATCH   SkillMode: $SKILL_MODE (suffix=$SUFFIX)"
 echo "  Config:    $TMP_CFG (from benchmark_config.yaml)"
 echo "  Model:     ${ANTHROPIC_DEFAULT_SONNET_MODEL:-(from .env)}"
@@ -138,7 +136,7 @@ fi
 # avoids holding ~50 stopped containers across a long Phase-1->Phase-2 gap —
 # the cause of the heavy-tail "Container not found" missing cells. The per-skill
 # short-circuit guard (0-assistant-turn retry) lives inside --eval-after too.
-# Node-local CCR gateway (isolated per job); exports ANTHROPIC_BASE_URL=127.0.0.1.
+# Node-local CCR gateway (isolated per run); exports ANTHROPIC_BASE_URL=127.0.0.1.
 # Replaces the crash-prone shared login-node CCR. See scripts/lib_local_ccr.sh.
 if [[ "${SWE_LOCAL_CCR:-1}" == "1" ]]; then
     source "$PROJECT_DIR/scripts/lib_local_ccr.sh"
@@ -153,12 +151,12 @@ if [[ -n "${SWE_CODEX_BRIDGE_UPSTREAM:-}" ]]; then
     # kills the bridge and every cell fails fast). Try 3.
     BRIDGE_UP=0
     for _off in 0 7001 13501; do
-        BRIDGE_PORT=$((41000 + (SLURM_JOB_ID + _off) % 20000))
+        BRIDGE_PORT=$((41000 + (RUN_ID + _off) % 20000))
         BRIDGE_UPSTREAM="$SWE_CODEX_BRIDGE_UPSTREAM" \
         BRIDGE_API_KEY="${SWE_CODEX_BRIDGE_KEY:-}" \
         BRIDGE_PORT="$BRIDGE_PORT" \
             python "$PROJECT_DIR/src/proxy/responses_bridge.py" \
-            >> "$PROJECT_DIR/outputs/slurm_logs/bridge_${SLURM_JOB_ID}.log" 2>&1 &
+            >> "$PROJECT_DIR/outputs/logs/bridge_${RUN_ID}.log" 2>&1 &
         BRIDGE_PID=$!
         for _i in $(seq 1 15); do
             curl -sf -m 2 "http://127.0.0.1:${BRIDGE_PORT}/v1/models" >/dev/null 2>&1 && { BRIDGE_UP=1; break; }
@@ -173,7 +171,7 @@ if [[ -n "${SWE_CODEX_BRIDGE_UPSTREAM:-}" ]]; then
         exit 1
     fi
     # single merged EXIT trap — a bare `trap` here would overwrite the enroot
-    # isolation cleanup installed above and leak per-job rootfs into SWE_ISOLATE_ROOT
+    # isolation cleanup installed above and leak per-run rootfs into SWE_ISOLATE_ROOT
     trap 'kill ${BRIDGE_PID} 2>/dev/null || true; rm -rf "${_ISO_WEKA:-}" "${_ISO_LOCAL:-}" 2>/dev/null || true' EXIT
     export CODEX_BASE_URL="http://127.0.0.1:${BRIDGE_PORT}/v1"
     export CODEX_API_KEY="${CODEX_API_KEY:-bridge}"

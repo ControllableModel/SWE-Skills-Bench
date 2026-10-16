@@ -18,11 +18,10 @@ __pycache__/
 # Large data: enroot sqsh images under data/.
 data/
 
-# Generated outputs (run reports, API traces, SLURM logs)
+# Generated outputs (run reports, API traces, run logs)
 outputs/
 # legacy top-level locations (kept ignored until fully migrated under outputs/)
 reports/
 claude_process/
-slurm_logs/
 tmp_config/
 _tmp_config_*.yaml

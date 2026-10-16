@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Periodic trajectory health check — scan recent Kimi trajectories for OBVIOUS errors.
+"""Trajectory health check — scan the most recent trajectories for OBVIOUS errors.
 
 Red flags it looks for, per cell (newest N per mode):
   - UNKNOWN-CMD : "Unknown command: /skill" in the first user msg -> /skill-id failed to register
@@ -15,7 +15,7 @@ from collections import Counter
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AGENT = os.environ.get("AGENT", "claude")
-MODEL = os.environ.get("MODEL_NAME", "Kimi-K2.6")
+MODEL = os.environ.get("MODEL_NAME", "claude-haiku-4-5")
 N = int(os.environ.get("HC_N", "12"))  # newest N trajectories per mode
 PB = f"{ROOT}/outputs/claude_process/{AGENT}/{MODEL}"
 RB = f"{ROOT}/outputs/reports/{AGENT}/{MODEL}"
@@ -68,15 +68,6 @@ def main():
         print(f"CCR gateway: http {code}  {'OK' if code=='200' else 'CHECK'}")
     except Exception as e:
         print(f"CCR gateway: ERROR {e}")
-    try:
-        q = subprocess.run(["squeue", "-u", os.environ.get("USER", ""), "-h", "-o", "%j %T"],
-                           capture_output=True, text=True, timeout=10).stdout
-        run = sum(1 for x in q.splitlines() if "Kimi" in x and "RUNNING" in x)
-        pend = sum(1 for x in q.splitlines() if "Kimi" in x and "PENDING" in x)
-        print(f"jobs: {run} running, {pend} pending (Kimi)")
-    except Exception:
-        pass
-
     total_flags = Counter()
     for mode, suf in (("none", "use-skill-false"), ("one", "use-skill-one")):
         tjs = sorted(glob.glob(f"{PB}/batch*/claude_thinking/*{suf}*.jsonl"), key=os.path.getmtime)[-N:]

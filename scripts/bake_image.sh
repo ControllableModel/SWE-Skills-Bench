@@ -1,22 +1,16 @@
 #!/bin/bash
-#SBATCH --job-name=bake-img
-#SBATCH --nodes=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
-#SBATCH --time=01:00:00
-#SBATCH --output=outputs/slurm_logs/%x-%j.out
-#SBATCH --error=outputs/slurm_logs/%x-%j.err
 #
 # Bake claude-cli@latest into a benchmark image via enroot export (no docker).
 # Env: BASE = sqsh basename without .sqsh, e.g. zhangyiiiiii+swe-skills-bench-bazel
 set -euo pipefail
-IMG="${SWE_ENROOT_IMAGE_CACHE:-${PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(pwd)}}/data/enroot-images}"
+RUN_ID="${RUN_ID:-${SLURM_JOB_ID:-$$}}"
+IMG="${SWE_ENROOT_IMAGE_CACHE:-${PROJECT_DIR:-$(pwd)}/data/enroot-images}"
 : "${BASE:?set BASE (e.g. zhangyiiiiii+swe-skills-bench-bazel)}"
 SRC="$IMG/${BASE}.sqsh"
 OUT="$IMG/${BASE}-cli2168.sqsh"
 [ -f "$SRC" ] || { echo "missing $SRC"; exit 1; }
 if [ -f "$OUT" ]; then echo "already baked: $OUT"; exit 0; fi
-NAME="bake_${BASE//[^a-zA-Z0-9]/_}_${SLURM_JOB_ID}"
+NAME="bake_${BASE//[^a-zA-Z0-9]/_}_${RUN_ID}"
 echo "[bake] host=$(hostname) $SRC -> $OUT"
 enroot create --name "$NAME" "$SRC" 2>&1 | tail -1
 echo "[bake] before: $(enroot start "$NAME" claude --version 2>&1 | head -1)"

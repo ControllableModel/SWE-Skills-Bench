@@ -79,7 +79,7 @@ class CodexCliProxy:
             check = self.docker_manager.execute_command("which codex", timeout=10)
             if check.exit_code != 0:
                 err = ("codex CLI not found in container PATH. Bake it into the image "
-                       "(scripts/bake_agents_image.sbatch -> *-codex.sqsh).")
+                       "(scripts/bake_agents_image.sh -> *-codex.sqsh).")
                 logger.error(err)
                 return ClaudeCodeResult(
                     success=False, output="", stderr=err, exit_code=127,

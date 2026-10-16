@@ -84,7 +84,7 @@ tests/batchN/test_<id>.py       hidden test suites used for scoring
 docker/
   <lang>/Dockerfile             per-language benchmark images
   base/, skills/                base layers and per-skill Dockerfiles
-scripts/                        SLURM runner, sweep launchers, image baking, health check, table builders
+scripts/                        batch runner, sweep runner, image baking, health check, table builders
 proxy/ccr_config.reference.json claude-code-router template (for non-Anthropic models)
 docs/                           requirement-doc template and data-generation prompts
 results/final_results/          final result tables
@@ -95,23 +95,23 @@ results/final_results/          final result tables
 ## Containers: enroot (used) and Docker (provided)
 
 **All reported results were produced with [enroot](https://github.com/NVIDIA/enroot)** on a
-SLURM cluster without a Docker daemon (`global.container_backend: enroot` in the config).
+HPC cluster without a Docker daemon (`global.container_backend: enroot` in the config).
 Images are pulled from Docker Hub (`zhangyiiiiii/swe-skills-bench-*`) and stored as squashfs
 files in `$SWE_ENROOT_IMAGE_CACHE` (default `data/enroot-images/`). An image ref maps to a file
 by replacing `/` and `:` with `+`, e.g. `zhangyiiiiii+swe-skills-bench-python.sqsh`.
 
-At run time `scripts/run_batch.sbatch` picks the most specific cached variant of each image:
+At run time `scripts/run_batch.sh` picks the most specific cached variant of each image:
 `<image>-cli2168` (Claude Code CLI 2.1.168 baked in, required for `/skill-id` loading in `one`
-mode; build with `scripts/bake_image.sbatch`), or `<image>-cli2168-codex` / `<image>-codex` for
-the Codex arm (`scripts/bake_agents_image.sbatch`).
+mode; build with `scripts/bake_image.sh`), or `<image>-cli2168-codex` / `<image>-codex` for
+the Codex arm (`scripts/bake_agents_image.sh`).
 
 **The Dockerfiles for every image are in [`docker/`](docker/)**, so the environments can be
 inspected or rebuilt with Docker. A Docker backend is included
 (`container_backend: docker`), but the reported numbers were not produced with it.
 
 Note: some images used by newer skills (`*-ext` tags, e.g. `node-ext`, `cpp-ext`, `bun-ext`)
-may not be on Docker Hub. Build them from `docker/` or with the `scripts/build_*_image.sbatch`
-/ `scripts/bake_*_image.sbatch` scripts.
+may not be on Docker Hub. Build them from `docker/` or with the `scripts/build_*_image.sh`
+/ `scripts/bake_*_image.sh` scripts.
 
 ---
 
@@ -135,23 +135,26 @@ python main.py run -s fastapi-patterns --skill-mode one  --clean-container
 ```
 
 The agent CLIs (Claude Code, Codex) are baked into the images, so nothing has to be installed on
-the host. The jobs only orchestrate containers, and inference happens at the model endpoint, so
+the host. The runs only orchestrate containers, and inference happens at the model endpoint, so
 **no GPU is required**.
 
-### Full sweep on SLURM
+### Full sweep
 
 ```bash
-# one batch, one mode (98 cells)
-sbatch --export=ALL,BATCH=batch1,SKILL_MODE=none,AGENT=claude,MODEL_NAME=claude-haiku-4-5 \
-       scripts/run_batch.sbatch
+export AGENT=claude MODEL_NAME=claude-haiku-4-5 ANTHROPIC_AUTH_TOKEN=...
 
-# all 10 batches x {none, one} (20 chained jobs)
-PARTITION=<partition> bash scripts/launch_model_none_one.sh   # Claude Code arm
-PARTITION=<partition> bash scripts/launch_codex_none_one.sh   # Codex arm
+# one batch, one mode (98 cells)
+BATCH=batch1 SKILL_MODE=none bash scripts/run_batch.sh
+
+# all 10 batches x {none, one} = 1960 cells
+N_PARALLEL=2 SWE_ISOLATE_ENROOT=1 bash scripts/run_sweep.sh
 ```
 
-Useful environment knobs: `SWE_ISOLATE_ENROOT=1` (per-job enroot state, so several jobs can
-share a node), `SWE_TOTAL_TIMEOUT_SEC`, `ONLY_SKILLS_FILE`, `FORCE_RERUN=true`.
+Each `run_batch.sh` call handles one (batch, mode) pair, so on a cluster you can submit the
+20 pairs as independent jobs with any scheduler (the script also runs as-is under `sbatch`).
+
+Useful environment knobs: `SWE_ISOLATE_ENROOT=1` (per-run enroot state, so several runs can
+share a machine), `SWE_TOTAL_TIMEOUT_SEC`, `ONLY_SKILLS_FILE`, `FORCE_RERUN=true`.
 
 Outputs:
 
@@ -172,7 +175,7 @@ All credentials come from environment variables (or `.env`):
 | arm | settings |
 |---|---|
 | Claude Code + Anthropic API | `ANTHROPIC_AUTH_TOKEN`, `MODEL_NAME` |
-| Claude Code + OpenAI-compatible model | run [claude-code-router](https://github.com/musistudio/claude-code-router) with `proxy/ccr_config.reference.json` as `~/.claude-code-router/config.json`. `scripts/lib_local_ccr.sh` starts one per job. Set `ANTHROPIC_BASE_URL`, `ANTHROPIC_DEFAULT_SONNET_MODEL`, `MODEL_NAME`. |
+| Claude Code + OpenAI-compatible model | run [claude-code-router](https://github.com/musistudio/claude-code-router) with `proxy/ccr_config.reference.json` as `~/.claude-code-router/config.json`. `scripts/lib_local_ccr.sh` starts one per run. Set `ANTHROPIC_BASE_URL`, `ANTHROPIC_DEFAULT_SONNET_MODEL`, `MODEL_NAME`. |
 | Codex + OpenAI | `AGENT=codex`, `CODEX_MODEL`, `CODEX_API_KEY` (or `~/.codex/auth.json`) |
 | Codex + chat-only server (vLLM / SGLang) | additionally `SWE_CODEX_BRIDGE_UPSTREAM=<endpoint>/v1`, which starts `src/proxy/responses_bridge.py` (Responses API -> Chat Completions) |
 

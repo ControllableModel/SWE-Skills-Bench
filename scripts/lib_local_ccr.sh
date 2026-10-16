@@ -1,33 +1,31 @@
 # shellcheck shell=bash
 # ------------------------------------------------------------------------------------
-# lib_local_ccr.sh  —  start a NODE-LOCAL claude-code-router (CCR) gateway for this job.
+# lib_local_ccr.sh  —  start a local claude-code-router (CCR) gateway for this run.
 #
-# WHY: the benchmark drives the Claude Code CLI through CCR (Anthropic<->OpenAI protocol
-# gateway + reasoning transformer) to reach the self-hosted Kimi. A single SHARED CCR on
-# the login node is a crash-prone SPOF: it dies under concurrent streams / when the session
-# hops login nodes, silently turning dozens of cells into exit-1 empty runs. Since each job runs
-# on its own --exclusive node, give each its OWN local CCR instead.
+# WHY: for OpenAI-compatible models the Claude Code CLI is driven through CCR (Anthropic<->OpenAI
+# protocol gateway + reasoning transformer). A single shared gateway is a single point of
+# failure under many concurrent streams, so each run starts its own local instance.
 #
 # HOW IT WORKS: enroot shares the host network namespace, so the in-container claude reaches
-# a service on the compute node's loopback via http://127.0.0.1:3456 (same pattern as
-# scripts/smoke_api_proxy.sbatch). Per-instance state is isolated with HOME=/tmp/ccr-$JOBID
-# (CCR resolves its dir from $HOME; there is no dedicated CCR_DIR).
+# the gateway on the host loopback (http://127.0.0.1:$PORT). Per-instance state is isolated with
+# HOME=/tmp/ccr-$RUN_ID (CCR resolves its dir from $HOME).
 #
 # CONTRACT: source AFTER conda activate, BEFORE invoking run_all_skills.py. Requires
-# SLURM_JOB_ID. Optional env: KIMI_BASE_URL (override the kimi provider api_base_url),
+# RUN_ID (falls back to SLURM_JOB_ID, then the shell PID). Optional env: KIMI_BASE_URL
+# (override the provider api_base_url),
 # SERVICE_PORT (default 3456), CCR_NODE_BIN (node bin dir). On success it EXPORTS
 # ANTHROPIC_BASE_URL=http://127.0.0.1:$PORT and installs an EXIT trap to stop CCR + clean up.
-# On failure to become healthy it exits the job LOUDLY (never run against a dead gateway).
+# On failure to become healthy it exits the run LOUDLY (never run against a dead gateway).
 # ------------------------------------------------------------------------------------
 
-: "${SLURM_JOB_ID:?lib_local_ccr: SLURM_JOB_ID required}"
-# Per-job port (same scheme as the codex bridge): a fixed :3456 breaks node-sharing —
+RUN_ID="${RUN_ID:-${SLURM_JOB_ID:-$$}}"
+# Per-run port (same scheme as the codex bridge): a fixed :3456 breaks node-sharing —
 # the 2nd job's CCR fails to bind, its health probe then hits the 1st job's CCR (200!),
 # and when either job exits its trap kills the shared instance -> ConnectionRefused
 # mid-run for the survivor (2026-07-24 gf6: 6 cells). SERVICE_PORT still overrides.
-_LCCR_PORT="${SERVICE_PORT:-$((31000 + SLURM_JOB_ID % 20000))}"
-_LCCR_HOME="/tmp/ccr-${SLURM_JOB_ID}"
-_LCCR_NODE_BIN="${CCR_NODE_BIN:-$HOME/.nvm/versions/node/v24.14.1/bin}"
+_LCCR_PORT="${SERVICE_PORT:-$((31000 + RUN_ID % 20000))}"
+_LCCR_HOME="/tmp/ccr-${RUN_ID}"
+_LCCR_NODE_BIN="${CCR_NODE_BIN:-$(dirname "$(command -v node)")}"
 _LCCR_TEMPLATE="$HOME/.claude-code-router/config.json"
 
 mkdir -p "$_LCCR_HOME/.claude-code-router" "$_LCCR_HOME/tmp"

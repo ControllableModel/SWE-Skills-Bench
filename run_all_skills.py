@@ -101,7 +101,7 @@ class SkillRunner:
         cfg = copy.deepcopy(config)
         cfg.setdefault("global", {})["active_batch"] = batch_name
         # Unique per-process name: multiple concurrent run_all_skills invocations
-        # (e.g. size-1 SLURM array tasks of the same batch) must NOT share this file
+        # (e.g. parallel runs of the same batch) must NOT share this file
         # on the shared FS, or they race-delete each other's config -> "No such file".
         # Corralled under tmp_config/ so they don't litter the repo root.
         tmp_dir = Path("tmp_config")
