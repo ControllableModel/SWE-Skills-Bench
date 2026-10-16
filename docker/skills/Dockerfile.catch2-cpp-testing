@@ -1,0 +1,8 @@
+FROM swe-skills-bench-cpp:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/SFML/SFML /workspace/SFML \
+    && cd /workspace/SFML \
+    && git fetch --depth 1 origin 8efe42859dccf81b1720406998162dcff9398d56 \
+    && git checkout 8efe42859dccf81b1720406998162dcff9398d56
+RUN apt-get update && apt-get install -y libx11-dev libxrandr-dev libxcursor-dev libxi-dev libudev-dev libfreetype-dev libopenal-dev libflac-dev libvorbis-dev libgl-dev && rm -rf /var/lib/apt/lists/*
+WORKDIR /workspace
+CMD ["/bin/bash"]

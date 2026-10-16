@@ -1,0 +1,7 @@
+FROM swe-skills-bench-rust:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/vectordotdev/vector /workspace/vector \
+    && cd /workspace/vector \
+    && git fetch --depth 1 origin f1557d68c8e7f36feb8e2d0c7a04286817c6bf9f \
+    && git checkout f1557d68c8e7f36feb8e2d0c7a04286817c6bf9f
+WORKDIR /workspace
+CMD ["/bin/bash"]

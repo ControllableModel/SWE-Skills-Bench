@@ -1,0 +1,9 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/dubinc/dub /workspace/dub \
+    && cd /workspace/dub \
+    && git fetch --depth 1 origin 38641acef359738f4f33476dfe61efdb7a399faa \
+    && git checkout 38641acef359738f4f33476dfe61efdb7a399faa
+# For node projects, install deps
+RUN cd /workspace/dub && npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

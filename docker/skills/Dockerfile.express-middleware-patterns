@@ -1,0 +1,9 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/gothinkster/node-express-realworld-example-app /workspace/node-express-realworld-example-app \
+    && cd /workspace/node-express-realworld-example-app \
+    && git fetch --depth 1 origin 30b68e1e881462b2f4164ea09ab4c4f5699c7b0b \
+    && git checkout 30b68e1e881462b2f4164ea09ab4c4f5699c7b0b
+# For node projects, install deps
+RUN cd /workspace/node-express-realworld-example-app && npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

@@ -1,0 +1,7 @@
+FROM swe-skills-bench-python:latest
+# Path①: bs4 has no canonical GitHub repo; using mirror il-vladislav/BeautifulSoup4 (verify before use)
+RUN pip install beautifulsoup4 lxml --break-system-packages --no-cache-dir
+RUN git clone --depth 1 --filter=blob:none https://github.com/il-vladislav/BeautifulSoup4 /workspace/BeautifulSoup4 \
+    && cd /workspace/BeautifulSoup4 && git fetch --depth 1 origin 5449b795251f751efb6067ebe6054aa8afa4e7b4 && git checkout 5449b795251f751efb6067ebe6054aa8afa4e7b4
+WORKDIR /workspace
+CMD ["/bin/bash"]

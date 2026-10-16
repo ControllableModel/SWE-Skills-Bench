@@ -1,0 +1,7 @@
+FROM swe-skills-bench-python:latest
+# Path①: R = tool's own repo (networkx/networkx); library installed via wheel (no source build)
+RUN pip install networkx --break-system-packages --no-cache-dir
+RUN git clone --depth 1 --filter=blob:none https://github.com/networkx/networkx /workspace/networkx \
+    && cd /workspace/networkx && git fetch --depth 1 origin 489d5e65af00cc61e49d4a150cb9302d45805332 && git checkout 489d5e65af00cc61e49d4a150cb9302d45805332
+WORKDIR /workspace
+CMD ["/bin/bash"]

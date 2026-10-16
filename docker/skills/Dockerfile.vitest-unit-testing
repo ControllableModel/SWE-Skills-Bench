@@ -1,0 +1,9 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/vitejs/vite /workspace/vite \
+    && cd /workspace/vite \
+    && git fetch --depth 1 origin 30028f94516fa06dd0212567373169b3b3f6e393 \
+    && git checkout 30028f94516fa06dd0212567373169b3b3f6e393
+# For node projects, install deps
+RUN cd /workspace/vite && npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

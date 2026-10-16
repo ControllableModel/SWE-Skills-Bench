@@ -1,0 +1,6 @@
+FROM swe-skills-bench-jvm:latest
+# Path①: R = tool's own repo (junit-team/junit5)
+RUN git clone --depth 1 --filter=blob:none https://github.com/junit-team/junit5 /workspace/junit5 \
+    && cd /workspace/junit5 && git fetch --depth 1 origin 599a282171ae8b61bb24a8cfaabccf1279d0b9b1 && git checkout 599a282171ae8b61bb24a8cfaabccf1279d0b9b1
+WORKDIR /workspace
+CMD ["/bin/bash"]

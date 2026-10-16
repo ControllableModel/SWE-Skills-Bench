@@ -1,0 +1,17 @@
+FROM swe-skills-bench-golang:latest
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/etcd-io/etcd /workspace/grpc-service-definition \
+    && cd /workspace/grpc-service-definition \
+    && git fetch --depth 1 origin f3815932116c5d2edb91be9f0a63c7dc50127dc0 \
+    && git checkout f3815932116c5d2edb91be9f0a63c7dc50127dc0
+
+# Install gRPC Go tools
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+# Go skills typically just need go mod download
+RUN cd /workspace/grpc-service-definition && go mod download 2>/dev/null || true
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

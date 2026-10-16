@@ -1,0 +1,10 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/calcom/cal.com /workspace/cal.com \
+    && cd /workspace/cal.com \
+    && git fetch --depth 1 origin e9c6d0ee462d974740e71f5355cd36b72594352c \
+    && git checkout e9c6d0ee462d974740e71f5355cd36b72594352c
+# For node projects, install deps
+RUN cd /workspace/cal.com && npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true
+RUN cd /workspace/cal.com && npx prisma generate 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

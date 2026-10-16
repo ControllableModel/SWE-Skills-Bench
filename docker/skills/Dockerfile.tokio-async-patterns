@@ -1,0 +1,7 @@
+FROM swe-skills-bench-rust:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/tokio-rs/mini-redis /workspace/mini-redis \
+    && cd /workspace/mini-redis \
+    && git fetch --depth 1 origin 3d93b42bc363220f85af4fc9e1bebd35b588a4a3 \
+    && git checkout 3d93b42bc363220f85af4fc9e1bebd35b588a4a3
+WORKDIR /workspace
+CMD ["/bin/bash"]

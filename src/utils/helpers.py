@@ -1,0 +1,376 @@
+"""
+Helpers - Utility functions
+Provides various helper utilities.
+"""
+
+import os
+import re
+import json
+import hashlib
+from pathlib import Path
+from datetime import datetime
+from typing import Dict, Any, Optional
+
+import yaml
+
+
+def load_yaml_config(config_path: str) -> Dict[str, Any]:
+    """
+    Load a YAML configuration file.
+
+    Args:
+        config_path: Path to the configuration file
+
+    Returns:
+        Dict: Configuration dictionary
+    """
+    with open(config_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
+def save_json_report(data: Dict[str, Any], output_path: str) -> str:
+    """
+    Save a JSON report.
+
+    Args:
+        data: Report data
+        output_path: Output path
+
+    Returns:
+        str: Actual path the file was saved to
+    """
+    # Ensure the directory exists
+    ensure_dir(os.path.dirname(output_path))
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+    return output_path
+
+
+def get_timestamp(format: str = "%Y%m%d_%H%M%S") -> str:
+    """
+    Get the current timestamp string.
+
+    Args:
+        format: Time format
+
+    Returns:
+        str: Timestamp string
+    """
+    return datetime.now().strftime(format)
+
+
+def get_model_name() -> str:
+    """
+    Get the sanitized model name for output paths / container names.
+
+    Source order: ``MODEL_NAME`` env (preferred — lets the path/dir model identity
+    be decoupled from the value sent to the CLI's --model flag, e.g. when a gateway
+    routes a Claude-named request to a different backend), else
+    ``ANTHROPIC_DEFAULT_SONNET_MODEL``. Safe for file paths and container names.
+
+    Returns:
+        str: Sanitized model name; falls back to "unknown-model" when not set
+    """
+    raw_name = (
+        os.environ.get("MODEL_NAME")
+        or os.environ.get("ANTHROPIC_DEFAULT_SONNET_MODEL")
+        or "unknown-model"
+    )
+    sanitized = re.sub(r"[^A-Za-z0-9._-]+", "-", raw_name)
+    return sanitized or "unknown-model"
+
+
+def get_agent_name() -> str:
+    """
+    Get the sanitized agent name from the ``AGENT`` env var (claude | codex | gemini | ...).
+
+    Used as a top-level dimension in output paths and container names so the same
+    model run under different coding agents does not collide. Defaults to "claude"
+    (the only agent today), so existing runs are unaffected.
+    """
+    raw = os.environ.get("AGENT") or "claude"
+    sanitized = re.sub(r"[^A-Za-z0-9._-]+", "-", raw)
+    return sanitized or "claude"
+
+
+# Skill ids that collide with Claude Code BUILT-IN slash commands. Invoking
+# /security-review resolves to the built-in (which runs `git diff origin/HEAD...`
+# and dies in our repos) instead of the user skill -> 0-turn poisoned runs.
+# For the claude agent only, these skills are installed into the container (and
+# slash-invoked) under an aliased name; the host-side skill dir, config, report
+# filenames and eval are all unchanged. codex has no built-in command table, so
+# it keeps the original name.
+RESERVED_SKILL_NAMES = {"security-review"}
+SKILL_ALIAS_PREFIX = "skill-"
+
+
+def get_container_skill_name(skill_id: str) -> str:
+    """
+    The skill name to use INSIDE a claude-agent container for ``skill_id``.
+
+    Returns ``skill-<id>`` for ids in RESERVED_SKILL_NAMES (claude agent only),
+    otherwise the id unchanged.
+    """
+    if get_agent_name() != "codex" and skill_id in RESERVED_SKILL_NAMES:
+        return f"{SKILL_ALIAS_PREFIX}{skill_id}"
+    return skill_id
+
+
+def get_active_batch(config: Dict[str, Any]) -> str:
+    """
+    Get the active batch name from config.
+
+    Reads global.active_batch; falls back to the first entry in global.batches.
+
+    Args:
+        config: Full configuration dictionary
+
+    Returns:
+        str: Active batch name (e.g. "batch1")
+    """
+    g = config.get("global", {})
+    active = g.get("active_batch")
+    if active:
+        return str(active)
+    batches = g.get("batches", [])
+    return str(batches[0]) if batches else "batch1"
+
+
+def get_resolved_tasks_dir(config: Dict[str, Any]) -> str:
+    """
+    Get the fully resolved tasks directory path (tasks_dir/active_batch).
+
+    Args:
+        config: Full configuration dictionary
+
+    Returns:
+        str: Resolved path, e.g. "tasks/batch3"
+    """
+    g = config.get("global", {})
+    return os.path.join(g.get("tasks_dir", "tasks"), get_active_batch(config))
+
+
+def get_resolved_tests_dir(config: Dict[str, Any]) -> str:
+    """
+    Get the fully resolved tests directory path (tests_dir/active_batch).
+
+    Args:
+        config: Full configuration dictionary
+
+    Returns:
+        str: Resolved path, e.g. "tests/batch3"
+    """
+    g = config.get("global", {})
+    return os.path.join(g.get("tests_dir", "tests"), get_active_batch(config))
+
+
+def _flag_to_str(flag: Optional[Any]) -> str:
+    """Convert bool/str/None to normalized flag string."""
+    if isinstance(flag, bool):
+        return "true" if flag else "false"
+    if flag is None:
+        return "unknown"
+    return str(flag)
+
+
+def generate_report_filename(
+    prefix: str,
+    skill: Optional[str],
+    use_agent: Optional[Any],
+    use_skill: Optional[Any],
+    timestamp: Optional[str] = None,
+    ext: str = ".json",
+) -> str:
+    """
+    Generate a file name in the standard format:
+    {prefix}_{skill}_use-agent-{...}_use-skill-{...}_{timestamp}{ext}
+
+    Args:
+        prefix: File name prefix, e.g. "report", "eval_report", "claude"
+        skill: Skill name/ID; falls back to "unknown" when absent
+        use_agent: Whether to use the agent (bool/str); falls back to "unknown" when None
+        use_skill: Whether to use the skill (bool/str); falls back to "unknown" when None
+        timestamp: Explicit timestamp; uses current timestamp when empty
+        ext: Extension, default .json; can pass .jsonl/.log etc.
+
+    Returns:
+        str: Formatted file name (no path)
+    """
+
+    ts = timestamp or get_timestamp()
+    skill_part = (skill or "unknown").replace(" ", "-")
+    ua = _flag_to_str(use_agent)
+    us = _flag_to_str(use_skill)
+    if not ext.startswith("."):
+        ext = f".{ext}"
+    return f"{prefix}_{skill_part}_use-agent-{ua}_use-skill-{us}_{ts}{ext}"
+
+
+def ensure_dir(dir_path: str) -> Path:
+    """
+    Ensure a directory exists, creating it if necessary.
+
+    Args:
+        dir_path: Directory path
+
+    Returns:
+        Path: Directory Path object
+    """
+    path = Path(dir_path)
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def hash_file(file_path: str, algorithm: str = "sha256") -> str:
+    """
+    Compute the hash of a file.
+
+    Args:
+        file_path: Path to the file
+        algorithm: Hash algorithm
+
+    Returns:
+        str: Hash value
+    """
+    hasher = hashlib.new(algorithm)
+
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            hasher.update(chunk)
+
+    return hasher.hexdigest()
+
+
+def truncate_string(s: str, max_length: int = 1000, suffix: str = "...") -> str:
+    """
+    Truncate a string.
+
+    Args:
+        s: Original string
+        max_length: Maximum length
+        suffix: Truncation suffix
+
+    Returns:
+        str: Truncated string
+    """
+    if len(s) <= max_length:
+        return s
+    return s[: max_length - len(suffix)] + suffix
+
+
+def parse_duration(duration_str: str) -> int:
+    """
+    Parse a duration string into seconds.
+
+    Args:
+        duration_str: e.g. "30m", "1h", "1800s"
+
+    Returns:
+        int: Number of seconds
+    """
+    if duration_str.endswith("s"):
+        return int(duration_str[:-1])
+    elif duration_str.endswith("m"):
+        return int(duration_str[:-1]) * 60
+    elif duration_str.endswith("h"):
+        return int(duration_str[:-1]) * 3600
+    else:
+        return int(duration_str)
+
+
+def format_duration(seconds: float) -> str:
+    """
+    Format a number of seconds as a human-readable string.
+
+    Args:
+        seconds: Number of seconds
+
+    Returns:
+        str: Formatted string
+    """
+    if seconds < 60:
+        return f"{seconds:.1f}s"
+    elif seconds < 3600:
+        minutes = seconds / 60
+        return f"{minutes:.1f}m"
+    else:
+        hours = seconds / 3600
+        return f"{hours:.1f}h"
+
+
+def merge_dicts(base: Dict, override: Dict) -> Dict:
+    """
+    Deep-merge two dictionaries.
+
+    Args:
+        base: Base dictionary
+        override: Override dictionary
+
+    Returns:
+        Dict: Merged dictionary
+    """
+    result = base.copy()
+
+    for key, value in override.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            result[key] = merge_dicts(result[key], value)
+        else:
+            result[key] = value
+
+    return result
+
+
+class Counter:
+    """Simple counter."""
+
+    def __init__(self, initial: int = 0):
+        self.value = initial
+
+    def increment(self, amount: int = 1) -> int:
+        self.value += amount
+        return self.value
+
+    def decrement(self, amount: int = 1) -> int:
+        self.value -= amount
+        return self.value
+
+    def reset(self):
+        self.value = 0
+
+
+class Timer:
+    """Simple timer."""
+
+    def __init__(self):
+        self.start_time: Optional[datetime] = None
+        self.end_time: Optional[datetime] = None
+
+    def start(self):
+        self.start_time = datetime.now()
+        self.end_time = None
+
+    def stop(self):
+        self.end_time = datetime.now()
+
+    @property
+    def elapsed(self) -> float:
+        """Get elapsed time in seconds."""
+        if self.start_time is None:
+            return 0.0
+
+        end = self.end_time or datetime.now()
+        return (end - self.start_time).total_seconds()
+
+    @property
+    def elapsed_formatted(self) -> str:
+        """Get the elapsed time as a formatted string."""
+        return format_duration(self.elapsed)
+
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, *args):
+        self.stop()

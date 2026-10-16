@@ -1,0 +1,42 @@
+# =============================================================================
+# SWE-Skills-Bench Base Image: Python
+# Covers: terraform, helm, semgrep, hypothesis, scikit-learn, shap, dask,
+#         fastapi, flask, sqlalchemy, alembic, pydantic, mypy, marshmallow,
+#         protobuf, pytest-plugin, httpx, attrs, numba (19 skills)
+# =============================================================================
+FROM ubuntu:24.04
+
+LABEL maintainer="zhangyiiiiii"
+LABEL description="SWE-Skills-Bench Python base image with Claude Code"
+
+# Avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
+# ---- System packages ----
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git curl wget ca-certificates gnupg lsb-release \
+    build-essential python3 python3-pip python3-venv python3-dev \
+    unzip jq openssh-client \
+    # For protobuf skills
+    protobuf-compiler \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---- Node.js 20 LTS (needed for Claude Code) ----
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---- Python testing essentials ----
+RUN pip install --break-system-packages --no-cache-dir \
+    pytest pytest-timeout pytest-asyncio httpx
+
+# ---- Claude Code 2.1.168 (>=2.1.145 required for headless skill loading) ----
+RUN npm install -g @anthropic-ai/claude-code@2.1.168
+
+
+# ---- Workspace ----
+WORKDIR /workspace
+
+CMD ["/bin/bash"]

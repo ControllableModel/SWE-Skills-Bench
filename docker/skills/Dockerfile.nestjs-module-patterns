@@ -1,0 +1,9 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/lujakob/nestjs-realworld-example-app /workspace/nestjs-realworld-example-app \
+    && cd /workspace/nestjs-realworld-example-app \
+    && git fetch --depth 1 origin c1c2cc4e448b279ff083272df1ac50d20c3304fa \
+    && git checkout c1c2cc4e448b279ff083272df1ac50d20c3304fa
+# For node projects, install deps
+RUN cd /workspace/nestjs-realworld-example-app && npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

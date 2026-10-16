@@ -1,0 +1,7 @@
+FROM swe-skills-bench-node:latest
+# Path①: R = tool's own repo (TanStack/query)
+RUN git clone --depth 1 --filter=blob:none https://github.com/TanStack/query /workspace/query \
+    && cd /workspace/query && git fetch --depth 1 origin 763782a2403aefaa52ce76601cf0f4912045be34 && git checkout 763782a2403aefaa52ce76601cf0f4912045be34
+RUN cd /workspace/query && (npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true)
+WORKDIR /workspace
+CMD ["/bin/bash"]

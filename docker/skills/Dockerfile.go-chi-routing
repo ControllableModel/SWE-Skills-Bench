@@ -1,0 +1,13 @@
+FROM swe-skills-bench-golang:latest
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/cortexproject/cortex /workspace/go-chi-routing \
+    && cd /workspace/go-chi-routing \
+    && git fetch --depth 1 origin dd0a4bca83f1e57599f361cce021d2bf7a165538 \
+    && git checkout dd0a4bca83f1e57599f361cce021d2bf7a165538
+
+# Go skills typically just need go mod download
+RUN cd /workspace/go-chi-routing && go mod download 2>/dev/null || true
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

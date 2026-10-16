@@ -1,0 +1,7 @@
+FROM swe-skills-bench-node:latest
+# Path①: R = tool's own repo (typeorm/typeorm)
+RUN git clone --depth 1 --filter=blob:none https://github.com/typeorm/typeorm /workspace/typeorm \
+    && cd /workspace/typeorm && git fetch --depth 1 origin b6b64e4151513b3369c12001eee4968046b0183f && git checkout b6b64e4151513b3369c12001eee4968046b0183f
+RUN cd /workspace/typeorm && (npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true)
+WORKDIR /workspace
+CMD ["/bin/bash"]

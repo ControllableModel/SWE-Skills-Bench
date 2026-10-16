@@ -1,0 +1,9 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/evidence-dev/evidence /workspace/evidence \
+    && cd /workspace/evidence \
+    && git fetch --depth 1 origin bdf2ce10040f81dbfcd43acde438052cc25b8e5c \
+    && git checkout bdf2ce10040f81dbfcd43acde438052cc25b8e5c
+# For node projects, install deps
+RUN cd /workspace/evidence && npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

@@ -1,0 +1,7 @@
+FROM swe-skills-bench-node:latest
+# Path①: R = tool's own repo (react-hook-form/react-hook-form)
+RUN git clone --depth 1 --filter=blob:none https://github.com/react-hook-form/react-hook-form /workspace/react-hook-form \
+    && cd /workspace/react-hook-form && git fetch --depth 1 origin 1e00a1b18643d6de6cd9a92bcb05b996ac163455 && git checkout 1e00a1b18643d6de6cd9a92bcb05b996ac163455
+RUN cd /workspace/react-hook-form && (npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true)
+WORKDIR /workspace
+CMD ["/bin/bash"]

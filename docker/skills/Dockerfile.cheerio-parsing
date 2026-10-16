@@ -1,0 +1,7 @@
+FROM swe-skills-bench-node:latest
+# Path①: R = tool's own repo (cheeriojs/cheerio)
+RUN git clone --depth 1 --filter=blob:none https://github.com/cheeriojs/cheerio /workspace/cheerio \
+    && cd /workspace/cheerio && git fetch --depth 1 origin 4c0065dd8c8a1d20bf6b0df26bd2330f8c9144ed && git checkout 4c0065dd8c8a1d20bf6b0df26bd2330f8c9144ed
+RUN cd /workspace/cheerio && (npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true)
+WORKDIR /workspace
+CMD ["/bin/bash"]

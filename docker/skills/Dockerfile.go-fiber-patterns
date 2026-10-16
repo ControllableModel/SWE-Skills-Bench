@@ -1,0 +1,13 @@
+FROM swe-skills-bench-golang:latest
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/gofiber/fiber /workspace/go-fiber-patterns \
+    && cd /workspace/go-fiber-patterns \
+    && git fetch --depth 1 origin 9fd194f4e2b6c2203e9f9b8943444d22a0de8877 \
+    && git checkout 9fd194f4e2b6c2203e9f9b8943444d22a0de8877
+
+# Go skills typically just need go mod download
+RUN cd /workspace/go-fiber-patterns && go mod download 2>/dev/null || true
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

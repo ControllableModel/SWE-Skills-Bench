@@ -1,0 +1,7 @@
+FROM swe-skills-bench-golang:latest
+# Path①: R = tool's own repo (uber-go/fx)
+RUN git clone --depth 1 --filter=blob:none https://github.com/uber-go/fx /workspace/fx \
+    && cd /workspace/fx && git fetch --depth 1 origin d5da5b04ac906bfbad8b400baeee9b970c1be6f3 && git checkout d5da5b04ac906bfbad8b400baeee9b970c1be6f3
+RUN cd /workspace/fx && go mod download 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

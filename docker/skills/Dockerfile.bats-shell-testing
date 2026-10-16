@@ -1,0 +1,7 @@
+FROM swe-skills-bench-python:latest
+# Path①: R = tool's own repo (bats-core/bats-core); bats runtime via apt
+RUN apt-get update && apt-get install -y bats && rm -rf /var/lib/apt/lists/*
+RUN git clone --depth 1 --filter=blob:none https://github.com/bats-core/bats-core /workspace/bats-core \
+    && cd /workspace/bats-core && git fetch --depth 1 origin d9faff0d7bc32e7adebc6552446f978118d3ab3b && git checkout d9faff0d7bc32e7adebc6552446f978118d3ab3b
+WORKDIR /workspace
+CMD ["/bin/bash"]

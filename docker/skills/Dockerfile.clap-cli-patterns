@@ -1,0 +1,7 @@
+FROM swe-skills-bench-rust:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/BurntSushi/ripgrep /workspace/ripgrep \
+    && cd /workspace/ripgrep \
+    && git fetch --depth 1 origin 4519153e5e461527f4bca45b042fff45c4ec6fb9 \
+    && git checkout 4519153e5e461527f4bca45b042fff45c4ec6fb9
+WORKDIR /workspace
+CMD ["/bin/bash"]

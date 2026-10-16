@@ -1,0 +1,9 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/facebook/react /workspace/react \
+    && cd /workspace/react \
+    && git fetch --depth 1 origin 142cfde89edab3d4eabd6335458b4c8736cebfb6 \
+    && git checkout 142cfde89edab3d4eabd6335458b4c8736cebfb6
+# For node projects, install deps (uses yarn)
+RUN cd /workspace/react && yarn install 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

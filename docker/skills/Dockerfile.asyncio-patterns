@@ -1,0 +1,7 @@
+FROM swe-skills-bench-python:latest
+# Path①: R = tool's own repo (aio-libs/aiohttp); library installed via wheel (no source build)
+RUN pip install aiohttp pytest-asyncio --break-system-packages --no-cache-dir
+RUN git clone --depth 1 --filter=blob:none https://github.com/aio-libs/aiohttp /workspace/aiohttp \
+    && cd /workspace/aiohttp && git fetch --depth 1 origin c41e3b6ea2eccdeb6a32f9755525aecac48ba265 && git checkout c41e3b6ea2eccdeb6a32f9755525aecac48ba265
+WORKDIR /workspace
+CMD ["/bin/bash"]

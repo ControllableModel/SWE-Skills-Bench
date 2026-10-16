@@ -1,0 +1,9 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/fastify/fastify /workspace/fastify \
+    && cd /workspace/fastify \
+    && git fetch --depth 1 origin d1133d7eac09e075ccfd3b947f6a6e25d727d4d4 \
+    && git checkout d1133d7eac09e075ccfd3b947f6a6e25d727d4d4
+# For node projects, install deps
+RUN cd /workspace/fastify && npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

@@ -1,0 +1,7 @@
+FROM swe-skills-bench-python:latest
+# Path①: R = tool's own repo (sympy/sympy); library installed via wheel (no source build)
+RUN pip install sympy --break-system-packages --no-cache-dir
+RUN git clone --depth 1 --filter=blob:none https://github.com/sympy/sympy /workspace/sympy \
+    && cd /workspace/sympy && git fetch --depth 1 origin ba8647df9546cfb1ab15d7d2fcb573ae60203be7 && git checkout ba8647df9546cfb1ab15d7d2fcb573ae60203be7
+WORKDIR /workspace
+CMD ["/bin/bash"]

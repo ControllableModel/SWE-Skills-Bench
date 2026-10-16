@@ -1,0 +1,13 @@
+FROM swe-skills-bench-python:latest
+
+# Install semgrep
+RUN pip install semgrep --break-system-packages --no-cache-dir
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/semgrep/semgrep-rules.git /workspace/semgrep-rules \
+    && cd /workspace/semgrep-rules \
+    && git fetch --depth 1 origin fdc73542dfd6ff4efd8a6710310a4ee5326db6d7 \
+    && git checkout fdc73542dfd6ff4efd8a6710310a4ee5326db6d7
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

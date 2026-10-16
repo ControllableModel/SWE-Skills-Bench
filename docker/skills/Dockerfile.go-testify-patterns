@@ -1,0 +1,13 @@
+FROM swe-skills-bench-golang:latest
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/hashicorp/terraform /workspace/go-testify-patterns \
+    && cd /workspace/go-testify-patterns \
+    && git fetch --depth 1 origin 7e3f57b40b4e055206581d98c5f56a8ef010873e \
+    && git checkout 7e3f57b40b4e055206581d98c5f56a8ef010873e
+
+# Go skills typically just need go mod download
+RUN cd /workspace/go-testify-patterns && go mod download 2>/dev/null || true
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

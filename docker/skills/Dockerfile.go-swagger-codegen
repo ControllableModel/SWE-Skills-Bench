@@ -1,0 +1,7 @@
+FROM swe-skills-bench-golang:latest
+# Path①: R = tool's own repo (swaggo/swag)
+RUN git clone --depth 1 --filter=blob:none https://github.com/swaggo/swag /workspace/swag \
+    && cd /workspace/swag && git fetch --depth 1 origin fa1d2c801b35b1ee6d7baa0187580eb898c6e79c && git checkout fa1d2c801b35b1ee6d7baa0187580eb898c6e79c
+RUN cd /workspace/swag && go mod download 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

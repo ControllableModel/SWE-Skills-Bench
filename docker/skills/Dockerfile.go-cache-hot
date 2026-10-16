@@ -1,0 +1,7 @@
+FROM swe-skills-bench-golang:latest
+# Path①: R = tool's own repo (samber/hot)
+RUN git clone --depth 1 --filter=blob:none https://github.com/samber/hot /workspace/hot \
+    && cd /workspace/hot && git fetch --depth 1 origin 73dffb5b27265dbaccc13645c3336628e3b27971 && git checkout 73dffb5b27265dbaccc13645c3336628e3b27971
+RUN cd /workspace/hot && go mod download 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

@@ -1,0 +1,8 @@
+FROM swe-skills-bench-jvm:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/iluwatar/java-design-patterns /workspace/java-design-patterns \
+    && cd /workspace/java-design-patterns \
+    && git fetch --depth 1 origin 2d39fe7ed8acfb683890644355ab5156c9b37354 \
+    && git checkout 2d39fe7ed8acfb683890644355ab5156c9b37354
+RUN cd /workspace/java-design-patterns && mvn dependency:go-offline -B 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

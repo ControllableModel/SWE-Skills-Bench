@@ -1,0 +1,7 @@
+FROM swe-skills-bench-python:latest
+# Path①: R = tool's own repo (pola-rs/polars); library installed via wheel (no source build)
+RUN pip install polars --break-system-packages --no-cache-dir
+RUN git clone --depth 1 --filter=blob:none https://github.com/pola-rs/polars /workspace/polars \
+    && cd /workspace/polars && git fetch --depth 1 origin eb9f06745b9392ad6e12cd214c9874a2688ccdd4 && git checkout eb9f06745b9392ad6e12cd214c9874a2688ccdd4
+WORKDIR /workspace
+CMD ["/bin/bash"]

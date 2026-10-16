@@ -1,0 +1,7 @@
+FROM swe-skills-bench-node:latest
+# Path①: R = tool's own repo (kysely-org/kysely)
+RUN git clone --depth 1 --filter=blob:none https://github.com/kysely-org/kysely /workspace/kysely \
+    && cd /workspace/kysely && git fetch --depth 1 origin 5442d955c030a9d3fb9581a817e76a43f7a1d8b6 && git checkout 5442d955c030a9d3fb9581a817e76a43f7a1d8b6
+RUN cd /workspace/kysely && (npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true)
+WORKDIR /workspace
+CMD ["/bin/bash"]

@@ -1,0 +1,47 @@
+# =============================================================================
+# SWE-Skills-Bench Base Image: Golang
+# Covers: gin, grpc, go-concurrency, cobra, viper, go-validator, go-chi,
+#         go-fiber, go-testify, go-zap, gjson, logrus, fasthttp (13 skills)
+# =============================================================================
+FROM ubuntu:24.04
+
+LABEL maintainer="zhangyiiiiii"
+LABEL description="SWE-Skills-Bench Golang base image with Claude Code"
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
+# ---- System packages ----
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git curl wget ca-certificates gnupg lsb-release \
+    build-essential python3 python3-pip python3-dev \
+    unzip jq openssh-client \
+    protobuf-compiler \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---- Go 1.22 ----
+ENV GO_VERSION=1.22.5
+RUN wget -qO /tmp/go.tar.gz "https://go.dev/dl/go${GO_VERSION}.linux-$(dpkg --print-architecture).tar.gz" \
+    && tar -C /usr/local -xzf /tmp/go.tar.gz \
+    && rm /tmp/go.tar.gz
+ENV PATH="/usr/local/go/bin:/root/go/bin:${PATH}"
+ENV GOPATH="/root/go"
+
+# ---- Node.js 20 LTS (for Claude Code) ----
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---- Python testing essentials ----
+RUN pip install --break-system-packages --no-cache-dir \
+    pytest pytest-timeout
+
+# ---- Claude Code 2.1.168 (>=2.1.145 required for headless skill loading) ----
+RUN npm install -g @anthropic-ai/claude-code@2.1.168
+
+
+# ---- Workspace ----
+WORKDIR /workspace
+
+CMD ["/bin/bash"]

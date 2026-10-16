@@ -1,0 +1,12 @@
+FROM swe-skills-bench-python:latest
+
+# No extra deps needed, pytest already in base
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/pytest-dev/pytest.git /workspace/pytest \
+    && cd /workspace/pytest \
+    && git fetch --depth 1 origin 916a7598e51d321abddb851bc9ed356bf11b0534 \
+    && git checkout 916a7598e51d321abddb851bc9ed356bf11b0534
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

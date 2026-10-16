@@ -1,0 +1,9 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/apollographql/apollo-server /workspace/apollo-server \
+    && cd /workspace/apollo-server \
+    && git fetch --depth 1 origin 64c0e1bb5d79d571bf448c35aea0b31097e6ce9d \
+    && git checkout 64c0e1bb5d79d571bf448c35aea0b31097e6ce9d
+# For node projects, install deps
+RUN cd /workspace/apollo-server && npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

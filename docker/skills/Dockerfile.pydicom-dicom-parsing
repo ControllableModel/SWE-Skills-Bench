@@ -1,0 +1,7 @@
+FROM swe-skills-bench-python:latest
+# Path①: R = tool's own repo (pydicom/pydicom); library installed via wheel (no source build)
+RUN pip install pydicom numpy --break-system-packages --no-cache-dir
+RUN git clone --depth 1 --filter=blob:none https://github.com/pydicom/pydicom /workspace/pydicom \
+    && cd /workspace/pydicom && git fetch --depth 1 origin f15214fb9bc83d063f481552c487b02b28bfb7cc && git checkout f15214fb9bc83d063f481552c487b02b28bfb7cc
+WORKDIR /workspace
+CMD ["/bin/bash"]

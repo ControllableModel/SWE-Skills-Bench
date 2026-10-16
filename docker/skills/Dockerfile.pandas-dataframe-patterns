@@ -1,0 +1,7 @@
+FROM swe-skills-bench-python:latest
+# Path①: R = tool's own repo (pandas-dev/pandas); library installed via wheel (no source build)
+RUN pip install pandas --break-system-packages --no-cache-dir
+RUN git clone --depth 1 --filter=blob:none https://github.com/pandas-dev/pandas /workspace/pandas \
+    && cd /workspace/pandas && git fetch --depth 1 origin c4cc973ffccc06f30d4edb5092f5f42c7d476a3e && git checkout c4cc973ffccc06f30d4edb5092f5f42c7d476a3e
+WORKDIR /workspace
+CMD ["/bin/bash"]

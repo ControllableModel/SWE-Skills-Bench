@@ -1,0 +1,7 @@
+FROM swe-skills-bench-node:latest
+# Path①: R = tool's own repo (fabian-hiller/valibot)
+RUN git clone --depth 1 --filter=blob:none https://github.com/fabian-hiller/valibot /workspace/valibot \
+    && cd /workspace/valibot && git fetch --depth 1 origin c05bf954ada47d5ff953cdfad905cc701b25719c && git checkout c05bf954ada47d5ff953cdfad905cc701b25719c
+RUN cd /workspace/valibot && (npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true)
+WORKDIR /workspace
+CMD ["/bin/bash"]

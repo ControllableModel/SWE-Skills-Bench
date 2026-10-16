@@ -1,0 +1,10 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/tree-sitter/tree-sitter-python /workspace/tree-sitter-python \
+    && cd /workspace/tree-sitter-python \
+    && git fetch --depth 1 origin 26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64 \
+    && git checkout 26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64
+# For node projects, install deps
+RUN npm install -g tree-sitter-cli
+RUN cd /workspace/tree-sitter-python && npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

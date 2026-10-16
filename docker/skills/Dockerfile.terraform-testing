@@ -1,0 +1,18 @@
+FROM swe-skills-bench-python:latest
+
+# Install terraform CLI binary (v1.9.0)
+RUN ARCH=$(dpkg --print-architecture) && \
+    wget -q https://releases.hashicorp.com/terraform/1.9.0/terraform_1.9.0_linux_${ARCH}.zip && \
+    unzip -q terraform_1.9.0_linux_${ARCH}.zip && \
+    mv terraform /usr/local/bin/ && \
+    rm terraform_1.9.0_linux_${ARCH}.zip && \
+    terraform version
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/terraform-aws-modules/terraform-aws-vpc.git /workspace/terraform-aws-vpc \
+    && cd /workspace/terraform-aws-vpc \
+    && git fetch --depth 1 origin 3ffbd46fb1c7733e1b34d8666893280454e27436 \
+    && git checkout 3ffbd46fb1c7733e1b34d8666893280454e27436
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

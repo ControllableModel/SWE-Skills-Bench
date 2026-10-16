@@ -1,0 +1,7 @@
+FROM swe-skills-bench-jvm:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/antlr/grammars-v4 /workspace/grammars-v4 \
+    && cd /workspace/grammars-v4 \
+    && git fetch --depth 1 origin 55d2bd37ca9b4271ff1f5cb3868e7d58e68f5a0f \
+    && git checkout 55d2bd37ca9b4271ff1f5cb3868e7d58e68f5a0f
+WORKDIR /workspace
+CMD ["/bin/bash"]

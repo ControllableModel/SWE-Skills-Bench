@@ -1,0 +1,7 @@
+FROM swe-skills-bench-rust:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/shuttle-hq/shuttle /workspace/shuttle \
+    && cd /workspace/shuttle \
+    && git fetch --depth 1 origin a95d41386faa9e2b8bd09a684b5e5234d6d5650c \
+    && git checkout a95d41386faa9e2b8bd09a684b5e5234d6d5650c
+WORKDIR /workspace
+CMD ["/bin/bash"]

@@ -1,0 +1,7 @@
+FROM swe-skills-bench-python:latest
+# Path①: R = tool's own repo (python-pillow/Pillow); library installed via wheel (no source build)
+RUN pip install pillow --break-system-packages --no-cache-dir
+RUN git clone --depth 1 --filter=blob:none https://github.com/python-pillow/Pillow /workspace/Pillow \
+    && cd /workspace/Pillow && git fetch --depth 1 origin 701d40433650269af4607824e07309243a20d354 && git checkout 701d40433650269af4607824e07309243a20d354
+WORKDIR /workspace
+CMD ["/bin/bash"]

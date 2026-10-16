@@ -1,0 +1,7 @@
+FROM swe-skills-bench-python:latest
+# Path①: R = tool's own repo (scipy/scipy); library installed via wheel (no source build)
+RUN pip install scipy numpy --break-system-packages --no-cache-dir
+RUN git clone --depth 1 --filter=blob:none https://github.com/scipy/scipy /workspace/scipy \
+    && cd /workspace/scipy && git fetch --depth 1 origin 94070c2f3540a1a949876ca61c5f877212874e90 && git checkout 94070c2f3540a1a949876ca61c5f877212874e90
+WORKDIR /workspace
+CMD ["/bin/bash"]

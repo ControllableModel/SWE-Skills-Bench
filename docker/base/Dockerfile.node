@@ -1,0 +1,43 @@
+# =============================================================================
+# SWE-Skills-Bench Base Image: Node.js
+# Covers: vitest, duckdb(evidence), express, nestjs, graphql, prisma, drizzle,
+#         eslint-plugin, biome, zod, ajv, jest, tree-sitter, xstate (14 skills)
+# =============================================================================
+FROM ubuntu:24.04
+
+LABEL maintainer="zhangyiiiiii"
+LABEL description="SWE-Skills-Bench Node.js base image with Claude Code"
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
+# ---- System packages ----
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git curl wget ca-certificates gnupg lsb-release \
+    build-essential python3 python3-pip python3-dev \
+    # tree-sitter needs gcc for external scanner compilation
+    gcc g++ \
+    unzip jq openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---- Node.js 20 LTS ----
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---- Yarn (needed for some monorepos like facebook/react) ----
+RUN npm install -g yarn
+
+# ---- Python testing essentials ----
+RUN pip install --break-system-packages --no-cache-dir \
+    pytest pytest-timeout
+
+# ---- Claude Code 2.1.168 (>=2.1.145 required for headless skill loading) ----
+RUN npm install -g @anthropic-ai/claude-code@2.1.168
+
+
+# ---- Workspace ----
+WORKDIR /workspace
+
+CMD ["/bin/bash"]

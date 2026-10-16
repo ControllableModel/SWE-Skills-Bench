@@ -1,0 +1,54 @@
+# =============================================================================
+# SWE-Skills-Bench Base Image: JVM
+# Covers: mockito, antlr (2 skills)
+# =============================================================================
+FROM ubuntu:24.04
+
+LABEL maintainer="zhangyiiiiii"
+LABEL description="SWE-Skills-Bench JVM base image with Claude Code"
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
+# ---- System packages ----
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git curl wget ca-certificates gnupg lsb-release \
+    build-essential python3 python3-pip python3-dev \
+    unzip jq openssh-client \
+    # JDK 11 + Maven + Gradle
+    openjdk-11-jdk maven \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-$(dpkg --print-architecture 2>/dev/null || echo arm64)
+
+# ---- Gradle (latest stable) ----
+ENV GRADLE_VERSION=8.8
+RUN wget -qO /tmp/gradle.zip "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" \
+    && unzip -q /tmp/gradle.zip -d /opt \
+    && rm /tmp/gradle.zip \
+    && ln -s /opt/gradle-${GRADLE_VERSION}/bin/gradle /usr/local/bin/gradle
+
+# ---- ANTLR 4 jar (for antlr skill) ----
+ENV ANTLR_VERSION=4.13.2
+RUN wget -qO /usr/local/lib/antlr-${ANTLR_VERSION}-complete.jar \
+    "https://www.antlr.org/download/antlr-${ANTLR_VERSION}-complete.jar"
+ENV CLASSPATH="/usr/local/lib/antlr-${ANTLR_VERSION}-complete.jar:${CLASSPATH}"
+
+# ---- Node.js 20 LTS (for Claude Code) ----
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---- Python testing essentials ----
+RUN pip install --break-system-packages --no-cache-dir \
+    pytest pytest-timeout
+
+# ---- Claude Code 2.1.168 (>=2.1.145 required for headless skill loading) ----
+RUN npm install -g @anthropic-ai/claude-code@2.1.168
+
+
+# ---- Workspace ----
+WORKDIR /workspace
+
+CMD ["/bin/bash"]

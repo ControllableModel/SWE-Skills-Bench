@@ -1,0 +1,9 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/vercel/next.js /workspace/next.js \
+    && cd /workspace/next.js \
+    && git fetch --depth 1 origin 4167e1f135656c1ac616042f6d709712ba8f4b99 \
+    && git checkout 4167e1f135656c1ac616042f6d709712ba8f4b99
+# For node projects, install deps (large monorepo, use pnpm)
+RUN npm install -g pnpm && cd /workspace/next.js && pnpm install --frozen-lockfile 2>/dev/null || pnpm install 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

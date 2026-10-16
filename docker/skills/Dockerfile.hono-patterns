@@ -1,0 +1,7 @@
+FROM swe-skills-bench-node:latest
+# Path①: R = tool's own repo (honojs/hono)
+RUN git clone --depth 1 --filter=blob:none https://github.com/honojs/hono /workspace/hono \
+    && cd /workspace/hono && git fetch --depth 1 origin e50df01453e71b071c3e6136b161b160b9fdf916 && git checkout e50df01453e71b071c3e6136b161b160b9fdf916
+RUN cd /workspace/hono && (npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true)
+WORKDIR /workspace
+CMD ["/bin/bash"]

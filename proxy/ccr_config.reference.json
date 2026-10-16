@@ -1,0 +1,24 @@
+{
+  "LOG": true,
+  "HOST": "0.0.0.0",
+  "APIKEY": "<local-gateway-key>",
+  "Providers": [
+    {
+      "name": "kimi",
+      "api_base_url": "http://YOUR_MODEL_HOST:8000/v1/chat/completions",
+      "api_key": "<model-endpoint-key>",
+      "models": [
+        "Kimi-K2.6"
+      ],
+      "transformer": {
+        "use": [
+          "reasoning",
+          "streamoptions"
+        ]
+      }
+    }
+  ],
+  "Router": {
+    "default": "kimi,Kimi-K2.6"
+  }
+}

@@ -1,0 +1,9 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/statelyai/xstate /workspace/xstate \
+    && cd /workspace/xstate \
+    && git fetch --depth 1 origin e5435993b2dee17c0808c2997665df696865aebd \
+    && git checkout e5435993b2dee17c0808c2997665df696865aebd
+# For node projects, install deps
+RUN cd /workspace/xstate && npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

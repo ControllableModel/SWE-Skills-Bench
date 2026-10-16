@@ -1,0 +1,18 @@
+FROM swe-skills-bench-python:latest
+
+# Install helm v3.15.0 binary
+RUN ARCH=$(dpkg --print-architecture) && \
+    curl -sSL https://get.helm.sh/helm-v3.15.0-linux-${ARCH}.tar.gz -o helm.tar.gz && \
+    tar xzf helm.tar.gz && \
+    mv linux-${ARCH}/helm /usr/local/bin/ && \
+    rm -rf helm.tar.gz linux-${ARCH} && \
+    helm version
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/bitnami/charts.git /workspace/bitnami-charts \
+    && cd /workspace/bitnami-charts \
+    && git fetch --depth 1 origin fe98ff427195dcb29ce78006706c58d00667b667 \
+    && git checkout fe98ff427195dcb29ce78006706c58d00667b667
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

@@ -1,0 +1,13 @@
+FROM swe-skills-bench-python:latest
+
+# Install marshmallow and flask-smorest
+RUN pip install marshmallow flask-smorest --break-system-packages --no-cache-dir
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/marshmallow-code/flask-smorest.git /workspace/flask-smorest \
+    && cd /workspace/flask-smorest \
+    && git fetch --depth 1 origin 2eec1ea7607d9a4fcb26c9af7510c374fb509d41 \
+    && git checkout 2eec1ea7607d9a4fcb26c9af7510c374fb509d41
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

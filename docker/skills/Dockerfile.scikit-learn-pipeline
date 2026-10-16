@@ -1,0 +1,13 @@
+FROM swe-skills-bench-python:latest
+
+# Install scikit-learn and pandas
+RUN pip install scikit-learn pandas --break-system-packages --no-cache-dir
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/microsoft/recommenders.git /workspace/recommenders \
+    && cd /workspace/recommenders \
+    && git fetch --depth 1 origin 69743e9fd06e35ffec07b8495124e6522498e8dc \
+    && git checkout 69743e9fd06e35ffec07b8495124e6522498e8dc
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

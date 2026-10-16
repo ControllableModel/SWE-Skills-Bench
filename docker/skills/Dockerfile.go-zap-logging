@@ -1,0 +1,13 @@
+FROM swe-skills-bench-golang:latest
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/etcd-io/etcd /workspace/go-zap-logging \
+    && cd /workspace/go-zap-logging \
+    && git fetch --depth 1 origin f3815932116c5d2edb91be9f0a63c7dc50127dc0 \
+    && git checkout f3815932116c5d2edb91be9f0a63c7dc50127dc0
+
+# Go skills typically just need go mod download
+RUN cd /workspace/go-zap-logging && go mod download 2>/dev/null || true
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

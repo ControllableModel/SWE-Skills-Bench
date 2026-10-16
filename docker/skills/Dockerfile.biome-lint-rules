@@ -1,0 +1,9 @@
+FROM swe-skills-bench-node:latest
+RUN git clone --depth 1 --filter=blob:none https://github.com/microsoft/FluidFramework /workspace/FluidFramework \
+    && cd /workspace/FluidFramework \
+    && git fetch --depth 1 origin 66180ed14deaa1b275fa38304292cd995fd3c393 \
+    && git checkout 66180ed14deaa1b275fa38304292cd995fd3c393
+# For node projects, install deps (monorepo with pnpm)
+RUN npm install -g pnpm && cd /workspace/FluidFramework && pnpm install --frozen-lockfile 2>/dev/null || pnpm install 2>/dev/null || true
+WORKDIR /workspace
+CMD ["/bin/bash"]

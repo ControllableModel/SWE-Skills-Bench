@@ -1,0 +1,7 @@
+FROM swe-skills-bench-python:latest
+# Path①: R = tool's own repo (statsmodels/statsmodels); library installed via wheel (no source build)
+RUN pip install statsmodels pandas --break-system-packages --no-cache-dir
+RUN git clone --depth 1 --filter=blob:none https://github.com/statsmodels/statsmodels /workspace/statsmodels \
+    && cd /workspace/statsmodels && git fetch --depth 1 origin 899f4a4553ed28350319cb5100b4569fcf67babc && git checkout 899f4a4553ed28350319cb5100b4569fcf67babc
+WORKDIR /workspace
+CMD ["/bin/bash"]

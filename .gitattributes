@@ -1,0 +1,26 @@
+# Normalize line endings to LF in the repo for all text files.
+# Prevents spurious "whole file changed" diffs when a working copy gets CRLF.
+* text=auto eol=lf
+
+# Explicit text types (belt-and-suspenders for the formats in this repo).
+*.py     text eol=lf
+*.md     text eol=lf
+*.sh     text eol=lf
+*.sbatch text eol=lf
+*.yaml   text eol=lf
+*.yml    text eol=lf
+*.json   text eol=lf
+*.jsonl  text eol=lf
+*.txt    text eol=lf
+*.tsv    text eol=lf
+*.mjs    text eol=lf
+*.cfg    text eol=lf
+*.toml   text eol=lf
+*.hcl    text eol=lf
+
+# Binary types git must never touch (sqsh are gitignored, but be explicit).
+*.sqsh   binary
+*.png    binary
+*.jpg    binary
+*.gz     binary
+*.zip    binary

@@ -1,0 +1,7 @@
+FROM swe-skills-bench-node:latest
+# Path①: R = tool's own repo (trpc/trpc)
+RUN git clone --depth 1 --filter=blob:none https://github.com/trpc/trpc /workspace/trpc \
+    && cd /workspace/trpc && git fetch --depth 1 origin c7360d4eb3c89c336468809a293e5cda4b302d4b && git checkout c7360d4eb3c89c336468809a293e5cda4b302d4b
+RUN cd /workspace/trpc && (npm install --legacy-peer-deps 2>/dev/null || npm install 2>/dev/null || true)
+WORKDIR /workspace
+CMD ["/bin/bash"]

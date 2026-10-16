@@ -1,0 +1,13 @@
+FROM swe-skills-bench-golang:latest
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/cli/cli /workspace/cobra-cli-development \
+    && cd /workspace/cobra-cli-development \
+    && git fetch --depth 1 origin 352a00e83c1c0a9723c5fb863db1fa65157e4d2a \
+    && git checkout 352a00e83c1c0a9723c5fb863db1fa65157e4d2a
+
+# Go skills typically just need go mod download
+RUN cd /workspace/cobra-cli-development && go mod download 2>/dev/null || true
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

@@ -1,0 +1,13 @@
+FROM swe-skills-bench-python:latest
+
+# Install fastapi with all extras, httpx, and sqlmodel
+RUN pip install "fastapi[all]" httpx sqlmodel --break-system-packages --no-cache-dir
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/fastapi/full-stack-fastapi-template.git /workspace/full-stack-fastapi-template \
+    && cd /workspace/full-stack-fastapi-template \
+    && git fetch --depth 1 origin 13652b51ea0acca7dfe243ac25e2bbdc066f3c4f \
+    && git checkout 13652b51ea0acca7dfe243ac25e2bbdc066f3c4f
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

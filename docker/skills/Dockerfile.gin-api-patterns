@@ -1,0 +1,13 @@
+FROM swe-skills-bench-golang:latest
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/eddycjy/go-gin-example /workspace/gin-api-patterns \
+    && cd /workspace/gin-api-patterns \
+    && git fetch --depth 1 origin 4f5174ca325b37f23edadad7c88d49586816a69c \
+    && git checkout 4f5174ca325b37f23edadad7c88d49586816a69c
+
+# Go skills typically just need go mod tidy
+RUN cd /workspace/gin-api-patterns && go mod download 2>/dev/null || true
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

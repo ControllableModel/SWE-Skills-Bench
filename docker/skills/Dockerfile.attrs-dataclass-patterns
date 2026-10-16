@@ -1,0 +1,13 @@
+FROM swe-skills-bench-python:latest
+
+# Install attrs and cattrs
+RUN pip install attrs cattrs --break-system-packages --no-cache-dir
+
+# Clone repo at pinned commit
+RUN git clone --depth 1 --filter=blob:none https://github.com/python-attrs/attrs.git /workspace/attrs \
+    && cd /workspace/attrs \
+    && git fetch --depth 1 origin 0f758fe54a8742110f730ebbaf146e79f3937c8d \
+    && git checkout 0f758fe54a8742110f730ebbaf146e79f3937c8d
+
+WORKDIR /workspace
+CMD ["/bin/bash"]

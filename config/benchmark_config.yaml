@@ -1,0 +1,3002 @@
+global:
+  workspace_dir: /workspace
+  golden_reference_dir: /tmp/golden_reference
+  reports_dir: ./outputs/reports
+  log_level: INFO
+  tasks_dir: tasks
+  tests_dir: tests
+  batches:
+  - batch1
+  - batch2
+  - batch3
+  - batch4
+  - batch5
+  - batch6
+  - batch7
+  - batch8
+  - batch9
+  - batch10
+  active_batch: batch1
+  network_mode: bridge
+  container_backend: enroot
+skills:
+- id: add-uint-support
+  name: Add UInt Support
+  description: Restore uint32/uint64 operator support in PyTorch
+  type: repair
+  repo:
+    url: null
+    commit: null
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-pytorch:latest
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: cd pytorch && MAX_JOBS=4 USE_CUDA=0 python setup.py develop
+        expected_exit_code: 0
+        timeout: 3600
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_add_uint_support.py -v --tb=short
+        min_pass_rate: 0.5
+        timeout: 600
+- id: fix
+  name: React Code Fix & Linter
+  description: See task file for detailed mission requirements.
+  type: fix
+  repo:
+    url: https://github.com/michaelasper/upgradle
+    commit: 5f292188e9b427a96d3573b29e5677e4cdce58ea
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_fix.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: tdd-workflow
+  name: TDD Workflow
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/tdd-starters/python
+    commit: a1a2d04ae69bd50aba9dac2783737dfda8f048c9
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_tdd_workflow.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: security-review
+  name: Security Review (zh-TW)
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/babybuddy/babybuddy
+    commit: b307200149ae92d0d95dfde82e320d5401148dcf
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_security_review.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: springboot-tdd
+  name: Spring Boot TDD
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/spring-projects/spring-petclinic
+    commit: edf4db28affcc4741c79850a3d95bc3f177b5ff9
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-jvm
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 2400
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: ./mvnw compile -DskipTests
+        expected_exit_code: 0
+        timeout: 600
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_springboot_tdd.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: add-admin-api-endpoint
+  name: Ghost Admin API Endpoint Creator
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/TryGhost/Ghost
+    commit: 56a3ec2fb2474025da9541c924b207db98737322
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_add_admin_api_endpoint.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: mcp-builder
+  name: MCP Server Builder
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/modelcontextprotocol/servers
+    commit: f4244583a6af9425633e433a3eec000d23f4e011
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: cd src/markdown-sqlite && npm run build
+        expected_exit_code: 0
+        timeout: 300
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_mcp_builder.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: python-resilience
+  name: Python Resilience Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/encode/httpx
+    commit: b5addb64f0161ff6bfe94c124ef76f6a1fba5254
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_python_resilience.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: xlsx
+  name: Excel & Spreadsheet Automation
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/ericgazoni/openpyxl
+    commit: c55988e4904d4337ce4c35ab8b7dc305bca9de23
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_xlsx.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: turborepo
+  name: Turborepo Monorepo Build System
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/vercel/turbo
+    commit: 2e2f8c37bb705163831718aac69bc4c7ae1f7372
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: cd examples/cache-demo && npm install && npm run build
+        expected_exit_code: 0
+        timeout: 600
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_turborepo.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: github-actions-templates
+  name: GitHub Actions Templates
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/actions/starter-workflows
+    commit: affda94109f2228d5a7f542a28d23272ae31e00b
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_github_actions_templates.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 60
+- id: analytics-events
+  name: Metabase Frontend Analytics Events
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/metabase/metabase
+    commit: d8bb291939a60c44d8ba6eb7bb132a5e0f271cf1
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 2400
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_analytics_events.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: prometheus-configuration
+  name: Prometheus Configuration
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/prometheus/prometheus
+    commit: df61021436e3aa53917a76ae8a4599d2c7fe6097
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: go build ./...
+        expected_exit_code: 0
+        timeout: 600
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_prometheus_configuration.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: python-anti-patterns
+  name: Python Anti-Pattern Review
+  description: See task file for detailed mission requirements.
+  type: refactor
+  repo:
+    url: https://github.com/mahmoud/boltons
+    commit: 207651ee6055aabd0d9cdeac2e00140cdc208d44
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_python_anti_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: implementing-jsc-classes-zig
+  name: Bun Zig-JS Class Generator
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/oven-sh/bun
+    commit: 2e610b1402f5cc17f11803b01b87cbc59f563fab
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-bun-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 7200
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: bun run build
+        expected_exit_code: 0
+        timeout: 3600
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_implementing_jsc_classes_zig.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: add-malli-schemas
+  name: Metabase Malli Schema Architect
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/metabase/metabase
+    commit: d8bb291939a60c44d8ba6eb7bb132a5e0f271cf1
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-clojure
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 2400
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_add_malli_schemas.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: clojure-write
+  name: Clojure Development & REPL Workflow
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/metabase/metabase
+    commit: d8bb291939a60c44d8ba6eb7bb132a5e0f271cf1
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-clojure
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 2400
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_clojure_write.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: django-patterns
+  name: Django Architecture Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/saleor/saleor
+    commit: b6051eb07680de7b1f5609f4bee706b6ceb6de92
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_django_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: python-background-jobs
+  name: Python Background Jobs
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/celery/celery
+    commit: c38600d429eb0d457ce57ae4ec6b52fe9e40a28d
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_python_background_jobs.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: python-configuration
+  name: Python Configuration Management
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/fastapi/fastapi
+    commit: 937d3075f9456dfcdfe2e1f6bc3b8b7b9a6c6cad
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_python_configuration.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: creating-financial-models
+  name: Financial Modeling Suite
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/lballabio/QuantLib
+    commit: d570a9170894671bfeac9e815977f7e26ad46c05
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 7200
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: cmake -DCMAKE_BUILD_TYPE=Release -B build && cmake --build build --target quantlib-test-suite
+        expected_exit_code: 0
+        timeout: 3600
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_creating_financial_models.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: prompt-engineering-patterns
+  name: Prompt Engineering Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/langchain-ai/langchain
+    commit: 5fd07f7f94645c4298cd917b586b7ba5e2b2ce43
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_prompt_engineering_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: risk-metrics-calculation
+  name: Risk Metrics Calculation
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/quantopian/pyfolio
+    commit: 4b901f6d73aa02ceb6d04b7d83502e5c6f2e81aa
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_risk_metrics_calculation.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: vector-index-tuning
+  name: Vector Index Tuning
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/facebookresearch/faiss
+    commit: 0759009bd7ddf290170c930c70a722badd05aa7d
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 2400
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: cmake -B build && cmake --build build
+        expected_exit_code: 0
+        timeout: 1200
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_vector_index_tuning.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: rag-implementation
+  name: RAG Implementation Framework
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/langchain-ai/langchain
+    commit: 5fd07f7f94645c4298cd917b586b7ba5e2b2ce43
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_rag_implementation.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: spark-optimization
+  name: Spark Optimization
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/apache/spark
+    commit: 932f9f70d2e6b5495c80a6cc53397aa1343d342b
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-jvm
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 7200
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: ./build/mvn -DskipTests package
+        expected_exit_code: 0
+        timeout: 3600
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_spark_optimization.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: similarity-search-patterns
+  name: Similarity Search Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/milvus-io/milvus
+    commit: 4bec0269ee2a32c8df31d4c7d97cde4971e5ba14
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 2400
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: make milvus
+        expected_exit_code: 0
+        timeout: 1200
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_similarity_search_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: llm-evaluation
+  name: LLM Evaluation
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/stanford-crfm/helm
+    commit: 2fd9c305bf6bbcdcd0e86fb5069e185de29f0e41
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_llm_evaluation.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: analyze-ci
+  name: CI Failure Analyzer
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/getsentry/sentry
+    commit: 6cabd8cddd3bfb4657c19ef7119b3293f7866bce
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_analyze_ci.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 120
+- id: python-packaging
+  name: Python Packaging & Distribution
+  description: See task file for detailed mission requirements.
+  type: test
+  repo:
+    url: https://github.com/pypa/packaging
+    commit: 5d3ab595f9e1d564e7c48a2253c96ac38444ae63
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_python_packaging.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: gitops-workflow
+  name: GitOps Workflow for Kubernetes
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/fluxcd/flux2
+    commit: d9f51d047dbb2e3184539ca40740f7b6f808f8d7
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: go build ./...
+        expected_exit_code: 0
+        timeout: 300
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_gitops_workflow.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 120
+- id: linkerd-patterns
+  name: Linkerd Service Mesh Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/linkerd/linkerd2
+    commit: 00344cfe03011638f2ad7b2012ccc0969a1f0486
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: go build ./...
+        expected_exit_code: 0
+        timeout: 300
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_linkerd_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 120
+- id: changelog-automation
+  name: Changelog Automation
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/github-changelog-generator/github-changelog-generator
+    commit: 5a0cbdb6860ffc449e838541faf3f24e10d75722
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-ruby
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_changelog_automation.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: k8s-manifest-generator
+  name: Kubernetes Manifest Generator
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/kubernetes-sigs/kustomize
+    commit: 29bf16c673061f95dedeb502f5700cedc9cfe1f8
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: go build ./...
+        expected_exit_code: 0
+        timeout: 300
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_k8s_manifest_generator.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 60
+- id: nx-workspace-patterns
+  name: Nx Workspace Patterns
+  description: See task file for detailed mission requirements.
+  type: test
+  repo:
+    url: https://github.com/nrwl/nx
+    commit: b3cb4d826144ceadce28dda7f614fd357bc61fd0
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 2400
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: pnpm install && pnpm build
+        expected_exit_code: 0
+        timeout: 600
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_nx_workspace_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: bazel-build-optimization
+  name: Bazel Build Optimization
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/bazelbuild/bazel
+    commit: cca38cb9d3b46e92ea008eea8dfef701efdcbb6b
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-bazel
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 7200
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: cd examples/python-bazel && bazel build //...
+        expected_exit_code: 0
+        timeout: 600
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_bazel_build_optimization.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: istio-traffic-management
+  name: Istio Traffic Management
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/istio/istio
+    commit: f9e2236290e696a1ffae4c6c4e41ec3253fafb1e
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_istio_traffic_management.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 120
+- id: bash-defensive-patterns
+  name: Bash Defensive Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/koalaman/shellcheck
+    commit: cd41f794383b6159757575c9debbf198426b21aa
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-hask-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_bash_defensive_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: gitlab-ci-patterns
+  name: GitLab CI Patterns
+  description: See task file for detailed mission requirements.
+  type: fix
+  repo:
+    url: https://github.com/gitlabhq/gitlabhq
+    commit: d91b0b33f4c63b5f4b7307059a9b70d9b82a7b41
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-ruby
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 2400
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_gitlab_ci_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: implementing-agent-modes
+  name: PostHog Agent Mode Architect
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/PostHog/posthog
+    commit: ded7ef313da2a3b04ff0af9e781619a30dae3517
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_implementing_agent_modes.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: python-observability
+  name: Python Observability Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/open-telemetry/opentelemetry-python
+    commit: 742593b01f47cc47a8bc8d8f3057297258357192
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_python_observability.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: distributed-tracing
+  name: Distributed Tracing & Observability
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/open-telemetry/opentelemetry-collector
+    commit: 01ca8295bb51a66326354322b829b1e2cd2cf7aa
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: go build ./...
+        expected_exit_code: 0
+        timeout: 300
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_distributed_tracing.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: service-mesh-observability
+  name: Service Mesh Observability
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/linkerd/linkerd2
+    commit: 00344cfe03011638f2ad7b2012ccc0969a1f0486
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: go build ./viz/...
+        expected_exit_code: 0
+        timeout: 300
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_service_mesh_observability.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: slo-implementation
+  name: SLO Implementation Framework
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/google/slo-generator
+    commit: 771848d6b7eeccfebb939042f5aa27463ee5d426
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_slo_implementation.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: python-performance-optimization
+  name: Python Performance Optimizer
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/benfred/py-spy
+    commit: 5e14e32f8d43be38cf538cd104531494f508c6d4
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-rust
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: cargo build --release
+        expected_exit_code: 0
+        timeout: 600
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_python_performance_optimization.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 1500
+- id: grafana-dashboards
+  name: Grafana Dashboards
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/grafana/grafana
+    commit: 311636cc570127168117962c2f4e258a09d5eb2b
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 2400
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: go build ./...
+        expected_exit_code: 0
+        timeout: 600
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_grafana_dashboards.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: dbt-transformation-patterns
+  name: dbt Transformation Patterns
+  description: See task file for detailed mission requirements.
+  type: test
+  repo:
+    url: https://github.com/dbt-labs/dbt-core
+    commit: 984005a5ea1f745ecc3238616deebe6d154894fc
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_dbt_transformation_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: langsmith-fetch
+  name: LangSmith Fetch
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/langchain-ai/langchain
+    commit: 5fd07f7f94645c4298cd917b586b7ba5e2b2ce43
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 1800
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_langsmith_fetch.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: v3-performance-optimization
+  name: V3 Performance Optimization
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/Dao-AILab/flash-attention
+    commit: abd9943b66704f650ea1485a17126cd3817d1b1d
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    limits:
+      max_iterations: 1
+      total_timeout_sec: 7200
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    evaluation:
+    - level: L1
+      method: build_check
+      enabled: true
+      params:
+        build_command: pip install -e . && python -c 'import flash_attn'
+        expected_exit_code: 0
+        timeout: 1800
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_v3_performance_optimization.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: terraform-module-patterns
+  name: Terraform Module Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/terraform-aws-modules/terraform-aws-vpc
+    commit: 3ffbd46fb1c7733e1b34d8666893280454e27436
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - wget -qO /tmp/tf.zip https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip && python3 -c "import zipfile,os; zipfile.ZipFile('/tmp/tf.zip').extractall('/usr/local/bin/'); os.chmod('/usr/local/bin/terraform',0o755)"
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_terraform_module_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: terraform-testing
+  name: Terraform Testing
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/terraform-aws-modules/terraform-aws-vpc
+    commit: 3ffbd46fb1c7733e1b34d8666893280454e27436
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - wget -qO /tmp/tf.zip https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip && python3 -c "import zipfile,os; zipfile.ZipFile('/tmp/tf.zip').extractall('/usr/local/bin/'); os.chmod('/usr/local/bin/terraform',0o755)"
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_terraform_testing.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: fastapi-patterns
+  name: Fastapi Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/fastapi/full-stack-fastapi-template
+    commit: 13652b51ea0acca7dfe243ac25e2bbdc066f3c4f
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install "fastapi[all]" httpx sqlmodel --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_fastapi_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: sqlalchemy-orm-patterns
+  name: Sqlalchemy Orm Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/getredash/redash
+    commit: e2437d8db8c8d12eaf23b7800b58ed3e9ea50353
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install sqlalchemy --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_sqlalchemy_orm_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: pytest-plugin-development
+  name: Pytest Plugin Development
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/pytest-dev/pytest
+    commit: 916a7598e51d321abddb851bc9ed356bf11b0534
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_pytest_plugin_development.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: pandas-dataframe-patterns
+  name: Pandas Dataframe Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/pandas-dev/pandas
+    commit: c4cc973ffccc06f30d4edb5092f5f42c7d476a3e
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install pandas --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_pandas_dataframe_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: polars-dataframe
+  name: Polars Dataframe
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/pola-rs/polars
+    commit: eb9f06745b9392ad6e12cd214c9874a2688ccdd4
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install polars --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_polars_dataframe.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: beautifulsoup-parsing
+  name: Beautifulsoup Parsing
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/il-vladislav/BeautifulSoup4
+    commit: 5449b795251f751efb6067ebe6054aa8afa4e7b4
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install beautifulsoup4 lxml --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_beautifulsoup_parsing.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: bats-shell-testing
+  name: Bats Shell Testing
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/bats-core/bats-core
+    commit: d9faff0d7bc32e7adebc6552446f978118d3ab3b
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - apt-get update && apt-get install -y bats
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_bats_shell_testing.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: scipy-scientific-computing
+  name: Scipy Scientific Computing
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/scipy/scipy
+    commit: 94070c2f3540a1a949876ca61c5f877212874e90
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install scipy numpy --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_scipy_scientific_computing.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 600
+- id: statsmodels-regression
+  name: Statsmodels Regression
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/statsmodels/statsmodels
+    commit: 899f4a4553ed28350319cb5100b4569fcf67babc
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install statsmodels pandas --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_statsmodels_regression.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: pillow-image-processing
+  name: Pillow Image Processing
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/python-pillow/Pillow
+    commit: 701d40433650269af4607824e07309243a20d354
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install pillow --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_pillow_image_processing.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: mypy-type-checking
+  name: Mypy Type Checking
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/psf/black
+    commit: 8dcc4865c8f9a2769411db5638927696172cdf75
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install mypy --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_mypy_type_checking.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: networkx-graph-algorithms
+  name: Networkx Graph Algorithms
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/networkx/networkx
+    commit: 489d5e65af00cc61e49d4a150cb9302d45805332
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install networkx --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_networkx_graph_algorithms.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: asyncio-patterns
+  name: Asyncio Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/aio-libs/aiohttp
+    commit: c41e3b6ea2eccdeb6a32f9755525aecac48ba265
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install pytest-asyncio --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_asyncio_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: sympy-symbolic-math
+  name: Sympy Symbolic Math
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/sympy/sympy
+    commit: ba8647df9546cfb1ab15d7d2fcb573ae60203be7
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install sympy --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_sympy_symbolic_math.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: pydicom-dicom-parsing
+  name: Pydicom Dicom Parsing
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/pydicom/pydicom
+    commit: f15214fb9bc83d063f481552c487b02b28bfb7cc
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-python
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - pip install pydicom numpy --break-system-packages
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_pydicom_dicom_parsing.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: vitest-unit-testing
+  name: Vitest Unit Testing
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/vitejs/vite
+    commit: 30028f94516fa06dd0212567373169b3b3f6e393
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/vite && (corepack enable pnpm || npm i -g pnpm) && pnpm install --no-frozen-lockfile
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_vitest_unit_testing.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 900
+- id: graphql-schema-design
+  name: Graphql Schema Design
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/apollographql/apollo-server
+    commit: 64c0e1bb5d79d571bf448c35aea0b31097e6ce9d
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/apollo-server && npm i graphql @apollo/server graphql-tag && npm i -D vitest
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_graphql_schema_design.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: drizzle-orm-patterns
+  name: Drizzle Orm Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/dubinc/dub
+    commit: 38641acef359738f4f33476dfe61efdb7a399faa
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/dub && npm i drizzle-orm better-sqlite3 && npm i -D drizzle-kit vitest @types/better-sqlite3
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_drizzle_orm_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: zod-schema-validation
+  name: Zod Schema Validation
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/calcom/cal.com
+    commit: e9c6d0ee462d974740e71f5355cd36b72594352c
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/cal.com && yarn install --frozen-lockfile=false
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_zod_schema_validation.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 900
+- id: jest-advanced-patterns
+  name: Jest Advanced Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/facebook/react
+    commit: 142cfde89edab3d4eabd6335458b4c8736cebfb6
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/react && yarn install --frozen-lockfile=false
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_jest_advanced_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 900
+- id: xstate-state-machine
+  name: Xstate State Machine
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/statelyai/xstate
+    commit: e5435993b2dee17c0808c2997665df696865aebd
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/xstate && (corepack enable pnpm || npm i -g pnpm) && pnpm install --no-frozen-lockfile
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_xstate_state_machine.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: prisma-schema-patterns
+  name: Prisma Schema Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/calcom/cal.com
+    commit: e9c6d0ee462d974740e71f5355cd36b72594352c
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/cal.com && npm i @prisma/client && npm i -D prisma
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_prisma_schema_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 900
+- id: typeorm-patterns
+  name: Typeorm Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/typeorm/typeorm
+    commit: b6b64e4151513b3369c12001eee4968046b0183f
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/typeorm && npm install
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_typeorm_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: kysely-query-builder
+  name: Kysely Query Builder
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/kysely-org/kysely
+    commit: 5442d955c030a9d3fb9581a817e76a43f7a1d8b6
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/kysely && npm i better-sqlite3 && npm i -D vitest
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_kysely_query_builder.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: fastify-patterns
+  name: Fastify Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/fastify/fastify
+    commit: c647de44cceaf8ec6ce81796374ff6ffd944d873
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/fastify && npm install
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_fastify_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: hono-patterns
+  name: Hono Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/honojs/hono
+    commit: e50df01453e71b071c3e6136b161b160b9fdf916
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/hono && npm install
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_hono_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: tanstack-query-patterns
+  name: Tanstack Query Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/TanStack/query
+    commit: 763782a2403aefaa52ce76601cf0f4912045be34
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node22-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/query && (corepack enable pnpm || npm i -g pnpm) && pnpm install --no-frozen-lockfile
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_tanstack_query_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: trpc-patterns
+  name: Trpc Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/trpc/trpc
+    commit: c7360d4eb3c89c336468809a293e5cda4b302d4b
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/trpc && (corepack enable pnpm || npm i -g pnpm) && pnpm install --no-frozen-lockfile
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_trpc_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: valibot-validation
+  name: Valibot Validation
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/fabian-hiller/valibot
+    commit: c05bf954ada47d5ff953cdfad905cc701b25719c
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/valibot && (corepack enable pnpm || npm i -g pnpm) && pnpm install --no-frozen-lockfile
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_valibot_validation.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: react-hook-form-patterns
+  name: React Hook Form Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/react-hook-form/react-hook-form
+    commit: 1e00a1b18643d6de6cd9a92bcb05b996ac163455
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/react-hook-form && npm i react-hook-form react react-dom && npm i -D vitest @testing-library/react jsdom
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_react_hook_form_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: zustand-state-management
+  name: Zustand State Management
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/pmndrs/zustand
+    commit: 566b5bf448f4354eb8e35c6243ea3772bdb3be96
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/zustand && (corepack enable pnpm || npm i -g pnpm) && pnpm install --no-frozen-lockfile
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_zustand_state_management.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: sequelize-orm
+  name: Sequelize Orm
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/sequelize/sequelize
+    commit: 8260c2905e22f92b8c908023faaf4ad99994981c
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/sequelize && npm install
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_sequelize_orm.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: cheerio-parsing
+  name: Cheerio Parsing
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/cheeriojs/cheerio
+    commit: 4c0065dd8c8a1d20bf6b0df26bd2330f8c9144ed
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-node-ext
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/cheerio && npm install
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_cheerio_parsing.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: grpc-service-definition
+  name: Grpc Service Definition
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/etcd-io/etcd
+    commit: f3815932116c5d2edb91be9f0a63c7dc50127dc0
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - apt-get update && apt-get install -y protobuf-compiler
+    - cd /workspace/grpc-service-definition && go mod download
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_grpc_service_definition.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 900
+- id: go-monads-mo
+  name: Go Monads Mo
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/samber/mo
+    commit: 35a143a391a281ca954b388bd8c6795ea1ee1955
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/mo && go mod download
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_go_monads_mo.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: go-concurrency-patterns
+  name: Go Concurrency Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/hashicorp/consul
+    commit: 329127db328cb3282b51e43bf1d327f76c832602
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/go-concurrency-patterns && go mod download
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_go_concurrency_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 900
+- id: cobra-cli-development
+  name: Cobra Cli Development
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/cli/cli
+    commit: 352a00e83c1c0a9723c5fb863db1fa65157e4d2a
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/cobra-cli-development && go mod download
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_cobra_cli_development.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: viper-configuration
+  name: Viper Configuration
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/gohugoio/hugo
+    commit: 72b85d5f9c2d40c06b81d496cd3ccf1f2105c383
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/viper-configuration && go mod download
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_viper_configuration.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 900
+- id: go-testify-patterns
+  name: Go Testify Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/hashicorp/terraform
+    commit: 7e3f57b40b4e055206581d98c5f56a8ef010873e
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/go-testify-patterns && go mod download
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_go_testify_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 900
+- id: go-fx-di
+  name: Go Fx Di
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/uber-go/fx
+    commit: d5da5b04ac906bfbad8b400baeee9b970c1be6f3
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/fx && go mod download
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_go_fx_di.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: samber-lo-functional
+  name: Samber Lo Functional
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/samber/lo
+    commit: 0875232f823bde660d71f5787c55021e96e5f150
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/lo && go mod download
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_samber_lo_functional.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: go-cache-hot
+  name: Go Cache Hot
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/samber/hot
+    commit: 73dffb5b27265dbaccc13645c3336628e3b27971
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/hot && go mod download
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_go_cache_hot.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: go-errors-oops
+  name: Go Errors Oops
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/samber/oops
+    commit: c57d8644bc0dd7ca0c0ac22ae5cf37075f1e7c44
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - cd /workspace/oops && go mod download
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_go_errors_oops.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: go-swagger-codegen
+  name: Go Swagger Codegen
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/swaggo/swag
+    commit: fa1d2c801b35b1ee6d7baa0187580eb898c6e79c
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-golang
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands:
+    - go install github.com/swaggo/swag/cmd/swag@latest
+    - cd /workspace/swag && go mod download
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_go_swagger_codegen.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 300
+- id: clap-cli-patterns
+  name: Clap Cli Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/BurntSushi/ripgrep
+    commit: 4519153e5e461527f4bca45b042fff45c4ec6fb9
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-rust
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_clap_cli_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 900
+- id: axum-web-patterns
+  name: Axum Web Patterns
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/shuttle-hq/shuttle
+    commit: a95d41386faa9e2b8bd09a684b5e5234d6d5650c
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-rust
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_axum_web_patterns.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 900
+- id: junit5-testing
+  name: Junit5 Testing
+  description: See task file for detailed mission requirements.
+  type: feature
+  repo:
+    url: https://github.com/junit-team/junit5
+    commit: 599a282171ae8b61bb24a8cfaabccf1279d0b9b1
+    sparse_checkout: []
+  environment:
+    base_image: zhangyiiiiii/swe-skills-bench-jvm
+    dockerfile: ''
+    build_context: ''
+    build_args: {}
+    env_vars: {}
+    setup_commands: []
+    pre_process: null
+    limits:
+      cpus: '4'
+      memory: 8g
+      timeout_per_command: 600
+      max_iterations: 1
+      total_timeout_sec: 2400
+    evaluation:
+    - level: L2
+      method: unit_test
+      enabled: true
+      params:
+        test_command: python -m pytest /workspace/tests/test_junit5_testing.py -v --tb=short
+        min_pass_rate: 1.0
+        timeout: 900
